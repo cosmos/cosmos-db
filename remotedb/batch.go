@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	db "github.com/cosmos/cosmos-db"
 	protodb "github.com/cosmos/cosmos-db/remotedb/proto"
-	db "github.com/tendermint/tm-db"
 )
 
 var errBatchClosed = errors.New("batch has been written or closed")

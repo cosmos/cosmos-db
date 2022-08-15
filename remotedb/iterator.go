@@ -1,8 +1,8 @@
 package remotedb
 
 import (
+	protodb "github.com/cosmos/cosmos-db/remotedb/proto"
 	db "github.com/tendermint/tm-db"
-	protodb "github.com/tendermint/tm-db/remotedb/proto"
 )
 
 func makeIterator(dic protodb.DB_IteratorClient) db.Iterator {

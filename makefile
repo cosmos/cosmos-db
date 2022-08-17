@@ -1,16 +1,16 @@
 GOTOOLS = github.com/golangci/golangci-lint/cmd/golangci-lint
 PACKAGES=$(shell go list ./...)
-INCLUDE = -I=${GOPATH}/src/github.com/cosmos/cosmos-db -I=${GOPATH}/src -I=${GOPATH}/src/github.com/gogo/protobuf/protobuf
+INCLUDE = -I=${GOPATH}/src/github.com/tendermint/tm-db -I=${GOPATH}/src -I=${GOPATH}/src/github.com/gogo/protobuf/protobuf
 
 export GO111MODULE = on
 
 all: lint test
 
 ### go tests
-## By default this will only test memdb & goleveldb
+## By default this will only test memdb, goleveldb, and pebbledb, which do not require cgo
 test:
 	@echo "--> Running go test"
-	@go test $(PACKAGES) -v
+	@go test $(PACKAGES) -tags pebbledb -v
 
 test-cleveldb:
 	@echo "--> Running go test"
@@ -19,6 +19,11 @@ test-cleveldb:
 test-rocksdb:
 	@echo "--> Running go test"
 	@go test $(PACKAGES) -tags rocksdb -v
+
+test-pebble:
+	@echo "--> Running go test"
+	@go test $(PACKAGES) -tags pebbledb -v
+
 
 test-all:
 	@echo "--> Running go test"

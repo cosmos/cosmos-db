@@ -11,7 +11,7 @@ jobs:
     container: archlinux
     steps:
       - name: install db libraries and go
-      - run: pacman -Syyu --noconfirm go base-devel leveldb rocksdb
+        run: pacman -Syyu --noconfirm go base-devel leveldb rocksdb
       - uses: actions/checkout@v3
       - uses: golangci/golangci-lint-action@v3.2.0
         with:

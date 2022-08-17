@@ -48,8 +48,10 @@ go install -tags pebbledb -ldflags "-w -s -X github.com/cosmos/cosmos-sdk/types.
 $HOME/go/bin/sifnoded start --db_backend=pebbledb
 
 */
-var ForceSync = "0"
-var isForceSync = false
+var (
+	ForceSync   = "0"
+	isForceSync = false
+)
 
 func init() {
 	dbCreator := func(name string, dir string) (DB, error) {

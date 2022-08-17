@@ -5,26 +5,18 @@ on:
       - master
   pull_request:
 jobs:
-  cleanup-runs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: rokroskar/workflow-run-cleanup-action@master
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-    if: "!startsWith(github.ref, 'refs/tags/') && github.ref != 'refs/heads/master'"
 
   Test:
     # The custom image here contains pre-built libraries for leveldb and
     # rocksdb, which are needed to build and test those modules.
     # To update the container image, see docker.yml.
     runs-on: ubuntu-latest
-    container: tendermintdev/docker-tm-db-testing
+    container: archlinux
     steps:
+      - name: install db libraries and go
+      - run: pacman -Syyu --noconfirm go base-devel leveldb rocksdb
       - uses: actions/checkout@v3
       - name: test & coverage report creation
         run: |
-          CGO_ENABLED=1 go test ./... -mod=readonly -timeout 8m -race -coverprofile=coverage.txt -covermode=atomic -tags=memdb,goleveldb,cleveldb,rocksdb -v
-      - uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage.txt
-          fail_ci_if_error: true  
+          go test ./... -mod=readonly -timeout 8m -race -coverprofile=coverage.txt -covermode=atomic -tags=memdb,goleveldb,cleveldb,rocksdb -v
+

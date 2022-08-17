@@ -46,7 +46,7 @@ func BenchmarkRandomReadsWrites2(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		// Write something
 		{
-			idx := (int64(rand.Int()) % numItems)
+			idx := (int64(rand.Int()) % numItems) //nolint:gosec
 			internal[idx]++
 			val := internal[idx]
 			idxBytes := int642Bytes(idx)
@@ -58,7 +58,7 @@ func BenchmarkRandomReadsWrites2(b *testing.B) {
 		}
 		// Read something
 		{
-			idx := (int64(rand.Int()) % numItems)
+			idx := (int64(rand.Int()) % numItems) //nolint:gosec
 			val := internal[idx]
 			idxBytes := int642Bytes(idx)
 			valBytes, err := db.Get(idxBytes)

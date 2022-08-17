@@ -7,11 +7,12 @@ on:
 jobs:
   Test:
     runs-on: ubuntu-latest
-    container: ghcr.io/notional-labs/cosmos
+    container: archlinux
     steps:
       - uses: actions/checkout@v3
       - name: test & coverage report creation
         run: |
+          pacman -Syyu --noconfirm go base-devel rocksdb leveldb
           CGO_ENABLED=1 go test ./... -mod=readonly -timeout 8m -race -coverprofile=coverage.txt -covermode=atomic -tags=memdb,goleveldb,cleveldb,rocksdb -v
       - uses: codecov/codecov-action@v3
         with:

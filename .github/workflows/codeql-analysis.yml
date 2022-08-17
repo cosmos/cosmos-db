@@ -38,7 +38,7 @@ jobs:
         # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
 
     steps:
-    - run: pacman -Syyu --noconfirm go base-devel rocksdb leveldb
+    - run: pacman -Syyu --noconfirm go base-devel rocksdb leveldb git
     - name: Checkout repository
       uses: actions/checkout@v3
 

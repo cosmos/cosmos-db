@@ -35,11 +35,6 @@ run:
     - badgerdb
     - boltdb
 
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - gosec
 linters-settings:
   maligned:
     suggest-new: true

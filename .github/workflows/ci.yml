@@ -14,7 +14,7 @@ jobs:
     container: archlinux
     steps:
       - name: install db libraries and go
-      - run: pacman -Syyu --noconfirm go base-devel leveldb rocksdb
+        run: pacman -Syyu --noconfirm go base-devel leveldb rocksdb
       - uses: actions/checkout@v3
       - name: test & coverage report creation
         run: |

@@ -10,11 +10,8 @@ jobs:
     container: archlinux
     steps:
       - uses: actions/checkout@v3
-      - name: test & coverage report creation
+      - name: run tests
         run: |
           pacman -Syyu --noconfirm go base-devel rocksdb leveldb
-          CGO_ENABLED=1 go test ./... -mod=readonly -timeout 8m -race -coverprofile=coverage.txt -covermode=atomic -tags=memdb,goleveldb,cleveldb,rocksdb -v
-      - uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage.txt
-          fail_ci_if_error: true
+          go test ./... -mod=readonly -timeout 8m -race -coverprofile=coverage.txt -covermode=atomic -tags=memdb,goleveldb,cleveldb,rocksdb -v
+

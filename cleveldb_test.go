@@ -55,7 +55,7 @@ func BenchmarkRandomReadsWrites2(b *testing.B) {
 				valBytes,
 			)
 			if err != nil {
-			fmt.Println("couldn't write something: cleveldb_test.go line 53")
+				fmt.Println("couldn't write something: cleveldb_test.go line 53")
 			}
 
 		}

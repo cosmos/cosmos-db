@@ -93,7 +93,7 @@ func benchmarkRangeScans(b *testing.B, db DB, dbSize int64) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		start := rand.Int63n(dbSize - rangeSize) //nolint:gosec
+		start := rand.Int63n(dbSize - rangeSize)
 		end := start + rangeSize
 		iter, err := db.Iterator(int642Bytes(start), int642Bytes(end))
 		require.NoError(b, err)

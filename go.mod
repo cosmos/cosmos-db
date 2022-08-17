@@ -1,13 +1,13 @@
 module github.com/cosmos/cosmos-db
 
-go 1.17
+go 1.19
 
 require (
 	github.com/cockroachdb/pebble v0.0.0-20220817183557-09c6e030a677
-	github.com/cosmos/gorocksdb v1.2.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/google/btree v1.1.2
 	github.com/jmhodges/levigo v1.0.0
+	github.com/linxGnu/grocksdb v1.7.4
 	github.com/stretchr/testify v1.8.0
 	github.com/syndtr/goleveldb v1.0.1-0.20200815110645-5c35d600f0ca
 	google.golang.org/grpc v1.48.0
@@ -37,6 +37,3 @@ require (
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-// Breaking changes were released with the wrong tag (use v0.6.6 or later).
-retract v0.6.5

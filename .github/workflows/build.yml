@@ -13,5 +13,5 @@ jobs:
       - name: run tests
         run: |
           pacman -Syyu --noconfirm go base-devel rocksdb leveldb
-          go test ./... -mod=readonly -timeout 8m -race -coverprofile=coverage.txt -covermode=atomic -tags=memdb,goleveldb,cleveldb,rocksdb -v
+          go test ./... -mod=readonly -timeout 8m -race -tags=memdb,goleveldb,cleveldb,rocksdb -v
 

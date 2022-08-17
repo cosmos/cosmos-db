@@ -27,7 +27,7 @@ test-pebble:
 
 test-all:
 	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags cleveldb,boltdb,rocksdb,badgerdb -v
+	@go test $(PACKAGES) -tags cleveldb,rocksdb,pebbledb -v
 
 lint:
 	@echo "--> Running linter"

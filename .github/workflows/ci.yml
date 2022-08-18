@@ -10,7 +10,7 @@ jobs:
     # rocksdb, which are needed to build and test those modules.
     # To update the container image, see docker.yml.
     runs-on: ubuntu-latest
-    container: ghcr.io/cosmos/cosmos-db/build-test:latest
+    container: tendermintdev/docker-tm-db-testing
     steps:
       - uses: actions/checkout@v3
       - name: run tests

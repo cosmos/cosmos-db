@@ -15,7 +15,6 @@ const (
 	//   - stable
 	GoLevelDBBackend BackendType = "goleveldb"
 	// CLevelDBBackend represents cleveldb (uses levigo wrapper)
-	//   - fast
 	//   - requires gcc
 	//   - use cleveldb build tag (go build -tags cleveldb)
 	CLevelDBBackend BackendType = "cleveldb"
@@ -23,12 +22,11 @@ const (
 	// for testing.
 	MemDBBackend BackendType = "memdb"
 	// RocksDBBackend represents rocksdb (uses github.com/linxGnu/grocksdb)
-	//   - EXPERIMENTAL
 	//   - requires gcc
 	//   - use rocksdb build tag (go build -tags rocksdb)
 	RocksDBBackend BackendType = "rocksdb"
 	// PebbleDBDBBackend represents pebble (uses github.com/cockroachdb/pebble)
-	//   - EXPERIMENTAL
+	//   - pure go
 	//   - use pebble build tag (go build -tags pebbledb)
 	PebbleDBBackend BackendType = "pebbledb"
 )

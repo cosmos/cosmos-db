@@ -45,7 +45,7 @@ func BenchmarkRandomReadsWrites2(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		// Write something
 		{
-			idx := (int64(rand.Int()) % numItems)
+			idx := (int64(rand.Int()) % numItems) //nolint:gosec
 			internal[idx]++
 			val := internal[idx]
 			idxBytes := int642Bytes(idx)
@@ -55,12 +55,12 @@ func BenchmarkRandomReadsWrites2(b *testing.B) {
 				valBytes,
 			)
 			if err != nil {
-				fmt.Println("cleveldb couldn't write something.")
+				fmt.Println("couldn't write something: cleveldb_test.go line 53")
 			}
 		}
 		// Read something
 		{
-			idx := (int64(rand.Int()) % numItems)
+			idx := (int64(rand.Int()) % numItems) //nolint:gosec
 			val := internal[idx]
 			idxBytes := int642Bytes(idx)
 			valBytes, err := db.Get(idxBytes)

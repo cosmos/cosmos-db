@@ -3,8 +3,8 @@ package db
 import (
 	"bytes"
 	"encoding/binary"
-	"io/ioutil"
 	"math/rand"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -67,7 +67,7 @@ func checkValuePanics(t *testing.T, itr Iterator) {
 }
 
 func newTempDB(t *testing.T, backend BackendType) (db DB, dbDir string) {
-	dirname, err := ioutil.TempDir("", "db_common_test")
+	dirname, err := os.MkdirTemp("", "db_common_test")
 	require.NoError(t, err)
 	db, err = NewDB("testdb", backend, dirname)
 	require.NoError(t, err)
@@ -93,7 +93,7 @@ func benchmarkRangeScans(b *testing.B, db DB, dbSize int64) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		start := rand.Int63n(dbSize - rangeSize)
+		start := rand.Int63n(dbSize - rangeSize) //nolint:gosec
 		end := start + rangeSize
 		iter, err := db.Iterator(int642Bytes(start), int642Bytes(end))
 		require.NoError(b, err)
@@ -122,7 +122,7 @@ func benchmarkRandomReadsWrites(b *testing.B, db DB) {
 	for i := 0; i < b.N; i++ {
 		// Write something
 		{
-			idx := rand.Int63n(numItems)
+			idx := rand.Int63n(numItems) //nolint:gosec
 			internal[idx]++
 			val := internal[idx]
 			idxBytes := int642Bytes(idx)
@@ -136,7 +136,7 @@ func benchmarkRandomReadsWrites(b *testing.B, db DB) {
 
 		// Read something
 		{
-			idx := rand.Int63n(numItems)
+			idx := rand.Int63n(numItems) //nolint:gosec
 			valExp := internal[idx]
 			idxBytes := int642Bytes(idx)
 			valBytes, err := db.Get(idxBytes)

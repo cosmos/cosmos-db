@@ -1,6 +1,6 @@
 GOTOOLS = github.com/golangci/golangci-lint/cmd/golangci-lint
 PACKAGES=$(shell go list ./...)
-INCLUDE = -I=${GOPATH}/src/github.com/tendermint/tm-db -I=${GOPATH}/src -I=${GOPATH}/src/github.com/gogo/protobuf/protobuf
+INCLUDE = -I=${GOPATH}/src/github.com/cosmos/cosmos-db -I=${GOPATH}/src -I=${GOPATH}/src/github.com/gogo/protobuf/protobuf
 
 export GO111MODULE = on
 
@@ -19,14 +19,6 @@ test-cleveldb:
 test-rocksdb:
 	@echo "--> Running go test"
 	@go test $(PACKAGES) -tags rocksdb -v
-
-test-boltdb:
-	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags boltdb -v
-
-test-badgerdb:
-	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags badgerdb -v
 
 test-all:
 	@echo "--> Running go test"

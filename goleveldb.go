@@ -34,7 +34,6 @@ func NewGoLevelDBWithOpts(name string, dir string, o *opt.Options) (*GoLevelDB, 
 		Filter: filter.NewBloomFilter(10),
 	}
 	db, err := leveldb.OpenFile(dbPath, options)
-
 	if err != nil {
 		return nil, err
 	}

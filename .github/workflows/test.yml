@@ -1,15 +1,14 @@
-name: Lint
+name: Test
 on:
   push:
     branches:
       - master
   pull_request:
-
 jobs:
-  golangci:
+  Test:
     runs-on: ubuntu-latest
     container: ghcr.io/cosmos/cosmos-db/build-test:latest
     steps:
       - uses: actions/checkout@v3
-      - uses: golangci/golangci-lint-action@v3.2.0
-
+      - name: run tests
+        run: go test ./... -mod=readonly -timeout 8m -race -coverprofile=coverage.txt -covermode=atomic -tags=memdb,goleveldb,cleveldb,rocksdb -v

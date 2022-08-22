@@ -26,12 +26,10 @@ var _ DB = (*GoLevelDB)(nil)
 
 func NewGoLevelDB(name string, dir string) (*GoLevelDB, error) {
 	options := &opt.Options{
-		BlockSize:              64, // this is for compatibility with raid 0 systems
 		Filter:                 filter.NewBloomFilter(10),
 		OpenFilesCacheCapacity: 8192,
 		BlockCacheCapacity:     opt.GiB,
 		WriteBuffer:            64 * opt.MiB,
-		DisableSeeksCompaction: true,
 	}
 	return NewGoLevelDBWithOpts(name, dir, options)
 }

@@ -2,4 +2,7 @@
 
 FROM archlinux
 
+ENV GOPATH /go
+ENV PATH $PATH:/go/bin
+
 RUN pacman -Syyu --noconfirm go base-devel rocksdb leveldb git

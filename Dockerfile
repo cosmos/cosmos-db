@@ -6,3 +6,6 @@ ENV GOPATH /go
 ENV PATH $PATH:/go/bin
 
 RUN pacman -Syyu --noconfirm go base-devel rocksdb leveldb git
+
+RUN mkdir /go && \
+      chmod -R 777 /go

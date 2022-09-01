@@ -26,7 +26,7 @@ var _ DB = (*GoLevelDB)(nil)
 
 func NewGoLevelDB(name string, dir string) (*GoLevelDB, error) {
 	options := &opt.Options{
-		Filter:                 filter.NewBloomFilter(10), // by default, goleveldb doesn't use a bloom filter.
+		Filter: filter.NewBloomFilter(10), // by default, goleveldb doesn't use a bloom filter.
 	}
 	return NewGoLevelDBWithOpts(name, dir, options)
 }

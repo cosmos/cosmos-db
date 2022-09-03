@@ -1,9 +1,3 @@
-GOTOOLS = github.com/golangci/golangci-lint/cmd/golangci-lint
-PACKAGES=$(shell go list ./...)
-INCLUDE = -I=${GOPATH}/src/github.com/tendermint/tm-db -I=${GOPATH}/src -I=${GOPATH}/src/github.com/gogo/protobuf/protobuf
-
-export GO111MODULE = on
-
 all: lint test
 
 ### go tests
@@ -37,5 +31,6 @@ lint:
 
 format:
 	find . -name '*.go' -type f -not -path "*.git*"  -not -name '*.pb.go' -not -name '*pb_test.go' | xargs gofumpt -w -l .
+	find . -name '*.go' -type f -not -path "*.git*"  -not -name '*.pb.go' -not -name '*pb_test.go' | xargs golangci-lint run --fix .
 .PHONY: format
 

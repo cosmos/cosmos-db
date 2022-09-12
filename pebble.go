@@ -54,7 +54,7 @@ var (
 )
 
 func init() {
-	dbCreator := func(name string, dir string) (DB, error) {
+	dbCreator := func(name string, dir string, opts DBOptions) (DB, error) {
 		return NewPebbleDB(name, dir)
 	}
 	registerDBCreator(PebbleDBBackend, dbCreator, false)

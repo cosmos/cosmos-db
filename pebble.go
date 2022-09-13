@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/cockroachdb/pebble"
+	"github.com/spf13/cast"
 )
 
 // ForceSync
@@ -55,7 +56,7 @@ var (
 
 func init() {
 	dbCreator := func(name string, dir string, opts DBOptions) (DB, error) {
-		return NewPebbleDB(name, dir)
+		return NewPebbleDB(name, dir, opts)
 	}
 	registerDBCreator(PebbleDBBackend, dbCreator, false)
 
@@ -71,15 +72,22 @@ type PebbleDB struct {
 
 var _ DB = (*PebbleDB)(nil)
 
-func NewPebbleDB(name string, dir string) (DB, error) {
-	dbPath := filepath.Join(dir, name+".db")
-	opts := &pebble.Options{
+func NewPebbleDB(name string, dir string, opts DBOptions) (DB, error) {
+	do := &pebble.Options{
 		MaxConcurrentCompactions: func() int { return 3 }, // default 1
 	}
 
-	opts.EnsureDefaults()
+	do.EnsureDefaults()
 
-	p, err := pebble.Open(dbPath, opts)
+	if opts != nil {
+		files := cast.ToInt(opts.Get("maxopenfiles"))
+		if files > 0 {
+			do.MaxOpenFiles = files
+		}
+	}
+
+	dbPath := filepath.Join(dir, name+".db")
+	p, err := pebble.Open(dbPath, do)
 	if err != nil {
 		return nil, err
 	}

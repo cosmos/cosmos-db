@@ -32,9 +32,9 @@ const (
 )
 
 type (
-	dbCreator func(name string, dir string, opts DBOptions) (DB, error)
+	dbCreator func(name string, dir string, opts Options) (DB, error)
 
-	DBOptions interface {
+	Options interface {
 		Get(string) interface{}
 	}
 )
@@ -54,7 +54,7 @@ func NewDB(name string, backend BackendType, dir string) (DB, error) {
 	return NewDBwithOptions(name, backend, dir, nil)
 }
 
-func NewDBwithOptions(name string, backend BackendType, dir string, opts DBOptions) (DB, error) {
+func NewDBwithOptions(name string, backend BackendType, dir string, opts Options) (DB, error) {
 	dbCreator, ok := backends[backend]
 	if !ok {
 		keys := make([]string, 0, len(backends))

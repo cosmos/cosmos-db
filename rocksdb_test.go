@@ -49,7 +49,7 @@ func TestRocksDBWithOptions(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "rocksdb")
 
-	opts := make(DBOptionsMap, 0)
+	opts := make(OptionsMap, 0)
 	opts["maxopenfiles"] = 1000
 
 	defaultOpts := defaultRocksdbOptions()

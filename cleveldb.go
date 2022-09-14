@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	dbCreator := func(name string, dir string, opts DBOptions) (DB, error) {
+	dbCreator := func(name string, dir string, opts Options) (DB, error) {
 		return NewCLevelDB(name, dir, opts)
 	}
 	registerDBCreator(CLevelDBBackend, dbCreator, false)
@@ -36,7 +36,7 @@ func defaultCleveldbOptions() *levigo.Options {
 }
 
 // NewCLevelDB creates a new CLevelDB.
-func NewCLevelDB(name string, dir string, opts DBOptions) (*CLevelDB, error) {
+func NewCLevelDB(name string, dir string, opts Options) (*CLevelDB, error) {
 	do := defaultCleveldbOptions()
 
 	if opts != nil {

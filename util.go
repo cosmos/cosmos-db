@@ -50,10 +50,10 @@ func FileExists(filePath string) bool {
 	return !os.IsNotExist(err)
 }
 
-// DBOptionsMap is a stub implementing DBOptions which can get data from a map
-type DBOptionsMap map[string]interface{}
+// OptionsMap is a stub implementing Options which can get data from a map
+type OptionsMap map[string]interface{}
 
-func (m DBOptionsMap) Get(key string) interface{} {
+func (m OptionsMap) Get(key string) interface{} {
 	v, ok := m[key]
 	if !ok {
 		return interface{}(nil)

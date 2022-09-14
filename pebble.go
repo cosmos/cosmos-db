@@ -55,7 +55,7 @@ var (
 )
 
 func init() {
-	dbCreator := func(name string, dir string, opts DBOptions) (DB, error) {
+	dbCreator := func(name string, dir string, opts Options) (DB, error) {
 		return NewPebbleDB(name, dir, opts)
 	}
 	registerDBCreator(PebbleDBBackend, dbCreator, false)
@@ -72,7 +72,7 @@ type PebbleDB struct {
 
 var _ DB = (*PebbleDB)(nil)
 
-func NewPebbleDB(name string, dir string, opts DBOptions) (DB, error) {
+func NewPebbleDB(name string, dir string, opts Options) (DB, error) {
 	do := &pebble.Options{
 		MaxConcurrentCompactions: func() int { return 3 }, // default 1
 	}

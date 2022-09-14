@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	dbCreator := func(name string, dir string, opts DBOptions) (DB, error) {
+	dbCreator := func(name string, dir string, opts Options) (DB, error) {
 		return NewRocksDB(name, dir, opts)
 	}
 	registerDBCreator(RocksDBBackend, dbCreator, false)
@@ -48,7 +48,7 @@ func defaultRocksdbOptions() *grocksdb.Options {
 	return rocksdbOpts
 }
 
-func NewRocksDB(name string, dir string, opts DBOptions) (*RocksDB, error) {
+func NewRocksDB(name string, dir string, opts Options) (*RocksDB, error) {
 	defaultOpts := defaultRocksdbOptions()
 
 	if opts != nil {

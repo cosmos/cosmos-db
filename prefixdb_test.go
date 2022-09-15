@@ -39,7 +39,7 @@ func randomValue() []byte {
 func TestGolevelDB(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "goleveldb")
 
-	db, err := NewGoLevelDB(path, "")
+	db, err := NewGoLevelDB(path, "", nil)
 	require.NoError(t, err)
 
 	Run(t, db)

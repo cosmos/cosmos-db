@@ -25,7 +25,6 @@ type GoLevelDB struct {
 
 var _ DB = (*GoLevelDB)(nil)
 
-
 func NewGoLevelDB(name string, dir string, opts Options) (*GoLevelDB, error) {
 	defaultOpts := &opt.Options{
 		Filter: filter.NewBloomFilter(10), // by default, goleveldb doesn't use a bloom filter.

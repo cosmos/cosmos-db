@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cast"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/errors"
+	"github.com/syndtr/goleveldb/leveldb/filter"
 	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
@@ -25,8 +26,9 @@ type GoLevelDB struct {
 var _ DB = (*GoLevelDB)(nil)
 
 func NewGoLevelDB(name string, dir string, opts Options) (*GoLevelDB, error) {
-	defaultOpts := &opt.Options{}
-
+	defaultOpts := &opt.Options{
+		Filter: filter.NewBloomFilter(10), // by default, goleveldb doesn't use a bloom filter.
+	}
 	if opts != nil {
 		files := cast.ToInt(opts.Get("maxopenfiles"))
 		if files > 0 {

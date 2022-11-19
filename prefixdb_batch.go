@@ -49,3 +49,11 @@ func (pb prefixDBBatch) WriteSync() error {
 func (pb prefixDBBatch) Close() error {
 	return pb.source.Close()
 }
+
+// GetByteSize implements Batch
+func (pb prefixDBBatch) GetByteSize() (uint64, error) {
+	if pb.source == nil {
+		return 0, errBatchClosed
+	}
+	return pb.source.GetByteSize()
+}

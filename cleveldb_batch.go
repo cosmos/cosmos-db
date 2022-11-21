@@ -16,6 +16,7 @@ func newCLevelDBBatch(db *CLevelDB) *cLevelDBBatch {
 	return &cLevelDBBatch{
 		db:    db,
 		batch: levigo.NewWriteBatch(),
+		size:  0,
 	}
 }
 

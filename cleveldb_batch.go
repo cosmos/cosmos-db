@@ -80,6 +80,7 @@ func (b *cLevelDBBatch) Close() error {
 	if b.batch != nil {
 		b.batch.Close()
 		b.batch = nil
+		b.size = 0
 	}
 	return nil
 }

@@ -93,6 +93,7 @@ func (b *memDBBatch) WriteSync() error {
 // Close implements Batch.
 func (b *memDBBatch) Close() error {
 	b.ops = nil
+	b.size = 0
 	return nil
 }
 

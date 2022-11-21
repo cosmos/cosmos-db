@@ -347,8 +347,18 @@ func testDBBatch(t *testing.T, backend BackendType) {
 	require.NoError(t, batch.Set([]byte("c"), []byte{3}))
 	assertKeyValues(t, db, map[string][]byte{})
 
+	batchSize, err := batch.GetByteSize()
+	require.NoError(t, err)
+	// batchSize should be grater than 6 which is the total size of keys and values
+	require.GreaterOrEqual(t, batchSize, uint64(6))
+
 	err = batch.Write()
 	require.NoError(t, err)
+
+	_, err = batch.GetByteSize()
+	// calling GetByteSize on a written batch should error
+	require.Error(t, err)
+
 	assertKeyValues(t, db, map[string][]byte{"a": {1}, "b": {2}, "c": {3}})
 
 	// trying to modify or rewrite a written batch should error, but closing it should work
@@ -366,6 +376,12 @@ func testDBBatch(t *testing.T, backend BackendType) {
 	require.NoError(t, batch.Set([]byte("b"), []byte{2}))
 	require.NoError(t, batch.Set([]byte("c"), []byte{3}))
 	require.NoError(t, batch.Delete([]byte("c")))
+
+	batchSize, err = batch.GetByteSize()
+	require.NoError(t, err)
+	// batchSize should be grater than 10 which is the total size of keys and values
+	require.GreaterOrEqual(t, batchSize, uint64(10))
+
 	require.NoError(t, batch.Write())
 	require.NoError(t, batch.Close())
 	assertKeyValues(t, db, map[string][]byte{"a": {1}, "b": {2}})

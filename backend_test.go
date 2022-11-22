@@ -354,7 +354,7 @@ func testDBBatch(t *testing.T, backend BackendType) {
 
 	batchSize, err = batch.GetByteSize()
 	require.NoError(t, err)
-	// batchSize should be grater than 6 which is the total size of keys and values
+	// batchSize should be greater than 6 which is the total size of keys and values
 	require.GreaterOrEqual(t, batchSize, uint32(6))
 
 	err = batch.Write()

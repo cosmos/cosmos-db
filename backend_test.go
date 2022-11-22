@@ -342,15 +342,20 @@ func testDBBatch(t *testing.T, backend BackendType) {
 
 	// create a new batch, and some items - they should not be visible until we write
 	batch := db.NewBatch()
+	batchSize, err := batch.GetByteSize()
+	require.NoError(t, err)
+	// batchSize should be zero for newly created batch
+	require.Equal(t, batchSize, uint32(0))
+
 	require.NoError(t, batch.Set([]byte("a"), []byte{1}))
 	require.NoError(t, batch.Set([]byte("b"), []byte{2}))
 	require.NoError(t, batch.Set([]byte("c"), []byte{3}))
 	assertKeyValues(t, db, map[string][]byte{})
 
-	batchSize, err := batch.GetByteSize()
+	batchSize, err = batch.GetByteSize()
 	require.NoError(t, err)
 	// batchSize should be grater than 6 which is the total size of keys and values
-	require.GreaterOrEqual(t, batchSize, uint64(6))
+	require.GreaterOrEqual(t, batchSize, uint32(6))
 
 	err = batch.Write()
 	require.NoError(t, err)
@@ -380,7 +385,7 @@ func testDBBatch(t *testing.T, backend BackendType) {
 	batchSize, err = batch.GetByteSize()
 	require.NoError(t, err)
 	// batchSize should be grater than 10 which is the total size of keys and values
-	require.GreaterOrEqual(t, batchSize, uint64(10))
+	require.GreaterOrEqual(t, batchSize, uint32(10))
 
 	require.NoError(t, batch.Write())
 	require.NoError(t, batch.Close())

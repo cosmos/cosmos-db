@@ -51,7 +51,7 @@ func (pb prefixDBBatch) Close() error {
 }
 
 // GetByteSize implements Batch
-func (pb prefixDBBatch) GetByteSize() (uint64, error) {
+func (pb prefixDBBatch) GetByteSize() (uint32, error) {
 	if pb.source == nil {
 		return 0, errBatchClosed
 	}

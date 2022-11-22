@@ -96,7 +96,7 @@ type Batch interface {
 	Close() error
 
 	// GetByteSize that returns the current size of the batch in bytes.
-	GetByteSize() (uint64, error)
+	GetByteSize() (uint32, error)
 }
 
 // Iterator represents an iterator over a domain of keys. Callers must call Close when done.

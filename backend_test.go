@@ -345,6 +345,7 @@ func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
 	batch := db.NewBatch()
 
 	totalSizeOfKeyAndValue := 0
+	// set 100 random keys and values
 	for i := 0; i < 100; i++ {
 		keySize := rand.Intn(32) + 1
 		valueSize := rand.Intn(32) + 1

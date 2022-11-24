@@ -360,7 +360,7 @@ func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
 	batchSize, err = batch.GetByteSize()
 	require.NoError(t, err)
 	// because of we set a lot of keys and values with considerable size, ratio of batchSize / totalSizeOfKeyAndValue should be roughly 1
-	require.Equal(t, uint32(1), batchSize/uint32(totalSizeOfKeyAndValue))
+	require.Equal(t, batchSize/uint32(totalSizeOfKeyAndValue), uint32(32))
 
 	err = batch.Write()
 	require.NoError(t, err)

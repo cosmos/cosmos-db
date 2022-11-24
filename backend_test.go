@@ -343,14 +343,6 @@ func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
 
 	// create a new batch, and some items - they should not be visible until we write
 	batch := db.NewBatch()
-	batchSize, err := batch.GetByteSize()
-	require.NoError(t, err)
-	// batchSize should be zero for newly created batch, except for rocksdb
-	if backend != "rocksdb" {
-		require.Equal(t, batchSize, uint32(0))
-	} else {
-		require.Equal(t, batchSize, uint32(0xc))
-	}
 
 	totalSizeOfKeyAndValue := 0
 	for i := 0; i < 100; i++ {
@@ -360,7 +352,7 @@ func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
 		require.NoError(t, batch.Set([]byte(randStr(keySize)), []byte(randStr(valueSize))))
 	}
 
-	batchSize, err = batch.GetByteSize()
+	batchSize, err := batch.GetByteSize()
 	require.NoError(t, err)
 	// because of we set a lot of keys and values with considerable size, ratio of batchSize / totalSizeOfKeyAndValue should be roughly 1
 	require.Equal(t, uint32(1), batchSize/uint32(totalSizeOfKeyAndValue))

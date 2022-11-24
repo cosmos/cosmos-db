@@ -343,6 +343,10 @@ func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
 
 	// create a new batch
 	batch := db.NewBatch()
+	batchSize, err := batch.GetByteSize()
+	require.NoError(t, err)
+	// size of newly created batch should be 0 or negligible
+	require.LessOrEqual(t, uint32(32), batchSize)
 
 	totalSizeOfKeyAndValue := 0
 	// set 100 random keys and values
@@ -353,7 +357,7 @@ func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
 		require.NoError(t, batch.Set([]byte(randStr(keySize)), []byte(randStr(valueSize))))
 	}
 
-	batchSize, err := batch.GetByteSize()
+	batchSize, err = batch.GetByteSize()
 	require.NoError(t, err)
 	// because of we set a lot of keys and values with considerable size, ratio of batchSize / totalSizeOfKeyAndValue should be roughly 1
 	require.Equal(t, uint32(1), batchSize/uint32(totalSizeOfKeyAndValue))

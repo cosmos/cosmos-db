@@ -383,7 +383,6 @@ func testDBBatchOperations(t *testing.T, backend BackendType) {
 
 	// create a new batch, and some items - they should not be visible until we write
 	batch := db.NewBatch()
-
 	require.NoError(t, batch.Set([]byte("a"), []byte{1}))
 	require.NoError(t, batch.Set([]byte("b"), []byte{2}))
 	require.NoError(t, batch.Set([]byte("c"), []byte{3}))
@@ -391,7 +390,6 @@ func testDBBatchOperations(t *testing.T, backend BackendType) {
 
 	err = batch.Write()
 	require.NoError(t, err)
-
 	assertKeyValues(t, db, map[string][]byte{"a": {1}, "b": {2}, "c": {3}})
 
 	// trying to modify or rewrite a written batch should error, but closing it should work
@@ -409,7 +407,6 @@ func testDBBatchOperations(t *testing.T, backend BackendType) {
 	require.NoError(t, batch.Set([]byte("b"), []byte{2}))
 	require.NoError(t, batch.Set([]byte("c"), []byte{3}))
 	require.NoError(t, batch.Delete([]byte("c")))
-
 	require.NoError(t, batch.Write())
 	require.NoError(t, batch.Close())
 	assertKeyValues(t, db, map[string][]byte{"a": {1}, "b": {2}})

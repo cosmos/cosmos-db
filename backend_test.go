@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"testing"
@@ -325,15 +326,15 @@ func verifyIterator(t *testing.T, itr Iterator, expected []int64, msg string) {
 	assert.Equal(t, expected, list, msg)
 }
 
-func TestDBBatch(t *testing.T) {
+func TestDBBatchGetByteSize(t *testing.T) {
 	for dbType := range backends {
 		t.Run(fmt.Sprintf("%v", dbType), func(t *testing.T) {
-			testDBBatch(t, dbType)
+			testDBBatchGetByteSize(t, dbType)
 		})
 	}
 }
 
-func testDBBatch(t *testing.T, backend BackendType) {
+func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
 	name := fmt.Sprintf("test_%x", randStr(12))
 	dir := os.TempDir()
 	db, err := NewDB(name, backend, dir)
@@ -344,18 +345,25 @@ func testDBBatch(t *testing.T, backend BackendType) {
 	batch := db.NewBatch()
 	batchSize, err := batch.GetByteSize()
 	require.NoError(t, err)
-	// batchSize should be zero for newly created batch
-	require.Equal(t, batchSize, uint32(0))
+	// batchSize should be zero for newly created batch, except for rocksdb
+	if backend != "rocksdb" {
+		require.Equal(t, batchSize, uint32(0))
+	} else {
+		require.Equal(t, batchSize, uint32(0xc))
+	}
 
-	require.NoError(t, batch.Set([]byte("a"), []byte{1}))
-	require.NoError(t, batch.Set([]byte("b"), []byte{2}))
-	require.NoError(t, batch.Set([]byte("c"), []byte{3}))
-	assertKeyValues(t, db, map[string][]byte{})
+	totalSizeOfKeyAndValue := 0
+	for i := 0; i < 100; i++ {
+		keySize := rand.Intn(32) + 1
+		valueSize := rand.Intn(32) + 1
+		totalSizeOfKeyAndValue += keySize + valueSize
+		require.NoError(t, batch.Set([]byte(randStr(keySize)), []byte(randStr(valueSize))))
+	}
 
 	batchSize, err = batch.GetByteSize()
 	require.NoError(t, err)
-	// batchSize should be greater than 6 which is the total size of keys and values
-	require.GreaterOrEqual(t, batchSize, uint32(6))
+	// because of we set a lot of keys and values with considerable size, ratio of batchSize / totalSizeOfKeyAndValue should be roughly 1
+	require.Equal(t, uint32(1), batchSize/uint32(totalSizeOfKeyAndValue))
 
 	err = batch.Write()
 	require.NoError(t, err)
@@ -363,6 +371,33 @@ func testDBBatch(t *testing.T, backend BackendType) {
 	_, err = batch.GetByteSize()
 	// calling GetByteSize on a written batch should error
 	require.Error(t, err)
+}
+
+func TestDBBatchOperations(t *testing.T) {
+	for dbType := range backends {
+		t.Run(fmt.Sprintf("%v", dbType), func(t *testing.T) {
+			testDBBatchOperations(t, dbType)
+		})
+	}
+}
+
+func testDBBatchOperations(t *testing.T, backend BackendType) {
+	name := fmt.Sprintf("test_%x", randStr(12))
+	dir := os.TempDir()
+	db, err := NewDB(name, backend, dir)
+	require.NoError(t, err)
+	defer cleanupDBDir(dir, name)
+
+	// create a new batch, and some items - they should not be visible until we write
+	batch := db.NewBatch()
+
+	require.NoError(t, batch.Set([]byte("a"), []byte{1}))
+	require.NoError(t, batch.Set([]byte("b"), []byte{2}))
+	require.NoError(t, batch.Set([]byte("c"), []byte{3}))
+	assertKeyValues(t, db, map[string][]byte{})
+
+	err = batch.Write()
+	require.NoError(t, err)
 
 	assertKeyValues(t, db, map[string][]byte{"a": {1}, "b": {2}, "c": {3}})
 
@@ -381,11 +416,6 @@ func testDBBatch(t *testing.T, backend BackendType) {
 	require.NoError(t, batch.Set([]byte("b"), []byte{2}))
 	require.NoError(t, batch.Set([]byte("c"), []byte{3}))
 	require.NoError(t, batch.Delete([]byte("c")))
-
-	batchSize, err = batch.GetByteSize()
-	require.NoError(t, err)
-	// batchSize should be grater than 10 which is the total size of keys and values
-	require.GreaterOrEqual(t, batchSize, uint32(10))
 
 	require.NoError(t, batch.Write())
 	require.NoError(t, batch.Close())

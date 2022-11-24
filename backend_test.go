@@ -341,7 +341,7 @@ func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
 	require.NoError(t, err)
 	defer cleanupDBDir(dir, name)
 
-	// create a new batch, and some items - they should not be visible until we write
+	// create a new batch
 	batch := db.NewBatch()
 
 	totalSizeOfKeyAndValue := 0

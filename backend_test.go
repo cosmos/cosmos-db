@@ -346,7 +346,8 @@ func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
 	batchSize, err := batch.GetByteSize()
 	require.NoError(t, err)
 	// size of newly created batch should be 0 or negligible because of the metadata in the batch,
-	// for example peppble's batchHeaderLen is 12 so peppble's batch size will always be equal or greater than 12 even for empty batch
+	// for example peppble's batchHeaderLen is 12 so
+	// peppble's batch size will always be equal or greater than 12 even for empty batch
 	require.LessOrEqual(t, batchSize, 32)
 
 	totalSizeOfKeyAndValue := 0
@@ -360,7 +361,8 @@ func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
 
 	batchSize, err = batch.GetByteSize()
 	require.NoError(t, err)
-	// because of we set a lot of keys and values with considerable size, ratio of batchSize / totalSizeOfKeyAndValue should be roughly 1
+	// because we set a lot of keys and values with considerable size,
+	// ratio of batchSize / totalSizeOfKeyAndValue should be roughly 1
 	require.Equal(t, 1, batchSize/totalSizeOfKeyAndValue)
 
 	err = batch.Write()

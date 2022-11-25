@@ -98,7 +98,7 @@ type Batch interface {
 	// GetByteSize that returns the current size of the batch in bytes. Depending on the implementation,
 	// this may return the size of the underlying LSM batch, including the size of additional metadata
 	// on top of the expected key and value total byte count.
-	GetByteSize() (uint32, error)
+	GetByteSize() (int, error)
 }
 
 // Iterator represents an iterator over a domain of keys. Callers must call Close when done.

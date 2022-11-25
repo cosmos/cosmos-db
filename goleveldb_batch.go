@@ -78,9 +78,9 @@ func (b *goLevelDBBatch) Close() error {
 }
 
 // GetByteSize implements Batch
-func (b *goLevelDBBatch) GetByteSize() (uint32, error) {
+func (b *goLevelDBBatch) GetByteSize() (int, error) {
 	if b.batch == nil {
 		return 0, errBatchClosed
 	}
-	return uint32(len(b.batch.Dump())), nil
+	return len(b.batch.Dump()), nil
 }

@@ -83,9 +83,9 @@ func (b *rocksDBBatch) Close() error {
 }
 
 // GetByteSize implements Batch
-func (b *rocksDBBatch) GetByteSize() (uint32, error) {
+func (b *rocksDBBatch) GetByteSize() (int, error) {
 	if b.batch == nil {
 		return 0, errBatchClosed
 	}
-	return uint32(len(b.batch.Data())), nil
+	return len(b.batch.Data()), nil
 }

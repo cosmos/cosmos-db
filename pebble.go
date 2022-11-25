@@ -364,11 +364,11 @@ func (b *pebbleDBBatch) Close() error {
 }
 
 // GetByteSize implements Batch
-func (b *pebbleDBBatch) GetByteSize() (uint32, error) {
+func (b *pebbleDBBatch) GetByteSize() (int, error) {
 	if b.batch == nil {
 		return 0, errBatchClosed
 	}
-	return uint32(b.batch.Len()), nil
+	return b.batch.Len(), nil
 }
 
 type pebbleDBIterator struct {

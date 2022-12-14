@@ -14,10 +14,6 @@ const (
 	//   - pure go
 	//   - stable
 	GoLevelDBBackend BackendType = "goleveldb"
-	// CLevelDBBackend represents cleveldb (uses levigo wrapper)
-	//   - requires gcc
-	//   - use cleveldb build tag (go build -tags cleveldb)
-	CLevelDBBackend BackendType = "cleveldb"
 	// MemDBBackend represents in-memory key value store, which is mostly used
 	// for testing.
 	MemDBBackend BackendType = "memdb"

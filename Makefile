@@ -12,10 +12,6 @@ test:
 	@echo "--> Running go test"
 	@go test $(PACKAGES) -tags pebbledb -v
 
-test-cleveldb:
-	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags cleveldb -v
-
 test-rocksdb:
 	@echo "--> Running go test"
 	@go test $(PACKAGES) -tags rocksdb -v
@@ -27,7 +23,7 @@ test-pebble:
 
 test-all:
 	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags cleveldb,rocksdb,pebbledb -v
+	@go test $(PACKAGES) -tags rocksdb,pebbledb -v
 
 lint:
 	@echo "--> Running linter"
@@ -38,4 +34,3 @@ lint:
 format:
 	find . -name '*.go' -type f -not -path "*.git*"  -not -name '*.pb.go' -not -name '*pb_test.go' | xargs gofumpt -w -l .
 .PHONY: format
-

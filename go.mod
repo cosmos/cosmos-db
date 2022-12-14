@@ -6,9 +6,9 @@ require (
 	github.com/cockroachdb/pebble v0.0.0-20220817183557-09c6e030a677
 	github.com/google/btree v1.1.2
 	github.com/jmhodges/levigo v1.0.0
-	github.com/linxGnu/grocksdb v1.7.5
-	github.com/spf13/cast v1.3.0
-	github.com/stretchr/testify v1.8.0
+	github.com/linxGnu/grocksdb v1.7.10
+	github.com/spf13/cast v1.5.0
+	github.com/stretchr/testify v1.8.1
 	github.com/syndtr/goleveldb v1.0.1-0.20200815110645-5c35d600f0ca
 )
 

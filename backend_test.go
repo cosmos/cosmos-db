@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"testing"
@@ -325,15 +326,62 @@ func verifyIterator(t *testing.T, itr Iterator, expected []int64, msg string) {
 	assert.Equal(t, expected, list, msg)
 }
 
-func TestDBBatch(t *testing.T) {
+func TestDBBatchGetByteSize(t *testing.T) {
 	for dbType := range backends {
 		t.Run(fmt.Sprintf("%v", dbType), func(t *testing.T) {
-			testDBBatch(t, dbType)
+			testDBBatchGetByteSize(t, dbType)
 		})
 	}
 }
 
-func testDBBatch(t *testing.T, backend BackendType) {
+func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
+	name := fmt.Sprintf("test_%x", randStr(12))
+	dir := os.TempDir()
+	db, err := NewDB(name, backend, dir)
+	require.NoError(t, err)
+	defer cleanupDBDir(dir, name)
+
+	// create a new batch
+	batch := db.NewBatch()
+	batchSize, err := batch.GetByteSize()
+	require.NoError(t, err)
+	// size of newly created batch should be 0 or negligible because of the metadata in the batch,
+	// for example peppble's batchHeaderLen is 12 so
+	// peppble's batch size will always be equal or greater than 12 even for empty batch
+	require.LessOrEqual(t, batchSize, 32)
+
+	totalSizeOfKeyAndValue := 0
+	// set 100 random keys and values
+	for i := 0; i < 100; i++ {
+		keySize := rand.Intn(32) + 1
+		valueSize := rand.Intn(32) + 1
+		totalSizeOfKeyAndValue += keySize + valueSize
+		require.NoError(t, batch.Set([]byte(randStr(keySize)), []byte(randStr(valueSize))))
+	}
+
+	batchSize, err = batch.GetByteSize()
+	require.NoError(t, err)
+	// because we set a lot of keys and values with considerable size,
+	// ratio of batchSize / totalSizeOfKeyAndValue should be roughly 1
+	require.Equal(t, 1, batchSize/totalSizeOfKeyAndValue)
+
+	err = batch.Write()
+	require.NoError(t, err)
+
+	_, err = batch.GetByteSize()
+	// calling GetByteSize on a written batch should error
+	require.Error(t, err)
+}
+
+func TestDBBatchOperations(t *testing.T) {
+	for dbType := range backends {
+		t.Run(fmt.Sprintf("%v", dbType), func(t *testing.T) {
+			testDBBatchOperations(t, dbType)
+		})
+	}
+}
+
+func testDBBatchOperations(t *testing.T, backend BackendType) {
 	name := fmt.Sprintf("test_%x", randStr(12))
 	dir := os.TempDir()
 	db, err := NewDB(name, backend, dir)

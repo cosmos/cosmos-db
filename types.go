@@ -94,6 +94,11 @@ type Batch interface {
 
 	// Close closes the batch. It is idempotent, but calls to other methods afterwards will error.
 	Close() error
+
+	// GetByteSize that returns the current size of the batch in bytes. Depending on the implementation,
+	// this may return the size of the underlying LSM batch, including the size of additional metadata
+	// on top of the expected key and value total byte count.
+	GetByteSize() (int, error)
 }
 
 // Iterator represents an iterator over a domain of keys. Callers must call Close when done.

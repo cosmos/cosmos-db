@@ -174,6 +174,7 @@ func (db *MemDB) NewBatch() Batch {
 }
 
 // NewBatchWithSize implements DB.
+// It does the same thing as NewBatch because we can't pre-allocate memDBBatch
 func (db *MemDB) NewBatchWithSize(size int) Batch {
 	return newMemDBBatch(db)
 }

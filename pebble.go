@@ -241,6 +241,7 @@ func (db *PebbleDB) NewBatch() Batch {
 }
 
 // NewBatchWithSize implements DB.
+// It does the same thing as NewBatch because we can't pre-allocate pebbleDBBatch
 func (db *PebbleDB) NewBatchWithSize(size int) Batch {
 	return newPebbleDBBatch(db)
 }

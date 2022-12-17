@@ -183,6 +183,7 @@ func (db *RocksDB) NewBatch() Batch {
 }
 
 // NewBatchWithSize implements DB.
+// It does the same thing as NewBatch because we can't pre-allocate rocksDBBatch
 func (db *RocksDB) NewBatchWithSize(size int) Batch {
 	return newRocksDBBatch(db)
 }

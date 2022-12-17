@@ -187,6 +187,11 @@ func (db *GoLevelDB) NewBatch() Batch {
 	return newGoLevelDBBatch(db)
 }
 
+// NewBatchWithSize implements DB.
+func (db *GoLevelDB) NewBatchWithSize(size int) Batch {
+	return newGoLevelDBBatchWithSize(db, size)
+}
+
 // Iterator implements DB.
 func (db *GoLevelDB) Iterator(start, end []byte) (Iterator, error) {
 	if (start != nil && len(start) == 0) || (end != nil && len(end) == 0) {

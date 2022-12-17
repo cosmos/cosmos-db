@@ -63,6 +63,9 @@ type DB interface {
 	// NewBatch creates a batch for atomic updates. The caller must call Batch.Close.
 	NewBatch() Batch
 
+	// NewBatchWithSize create a new batch for atomic updates, but with pre-allocated size
+	NewBatchWithSize(int) Batch
+
 	// Print is used for debugging.
 	Print() error
 

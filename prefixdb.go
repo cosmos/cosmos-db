@@ -143,6 +143,11 @@ func (pdb *PrefixDB) NewBatch() Batch {
 	return newPrefixBatch(pdb.prefix, pdb.db.NewBatch())
 }
 
+// NewBatchWithSize implements DB.
+func (pdb *PrefixDB) NewBatchWithSize(size int) Batch {
+	return newPrefixBatch(pdb.prefix, pdb.db.NewBatchWithSize(size))
+}
+
 // Close implements DB.
 func (pdb *PrefixDB) Close() error {
 	pdb.mtx.Lock()

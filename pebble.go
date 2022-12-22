@@ -240,6 +240,12 @@ func (db *PebbleDB) NewBatch() Batch {
 	return newPebbleDBBatch(db)
 }
 
+// NewBatchWithSize implements DB.
+// It does the same thing as NewBatch because we can't pre-allocate pebbleDBBatch
+func (db *PebbleDB) NewBatchWithSize(size int) Batch {
+	return newPebbleDBBatch(db)
+}
+
 // Iterator implements DB.
 func (db *PebbleDB) Iterator(start, end []byte) (Iterator, error) {
 	// fmt.Println("PebbleDB.Iterator")

@@ -173,6 +173,12 @@ func (db *MemDB) NewBatch() Batch {
 	return newMemDBBatch(db)
 }
 
+// NewBatchWithSize implements DB.
+// It does the same thing as NewBatch because we can't pre-allocate memDBBatch
+func (db *MemDB) NewBatchWithSize(size int) Batch {
+	return newMemDBBatch(db)
+}
+
 // Iterator implements DB.
 // Takes out a read-lock on the database until the iterator is closed.
 func (db *MemDB) Iterator(start, end []byte) (Iterator, error) {

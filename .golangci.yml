@@ -30,5 +30,4 @@ linters:
 
 run:
   build-tags:
-    - cleveldb
     - rocksdb

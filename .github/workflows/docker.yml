@@ -2,8 +2,10 @@ name: build docker image
 
 on:
   workflow_dispatch:
-  push:
   pull_request:
+  push:
+    branches:
+      - master
 
 jobs:
   build:

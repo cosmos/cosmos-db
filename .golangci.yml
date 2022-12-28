@@ -1,7 +1,14 @@
+run:
+  build-tags: 
+    - rocksdb
+  concurrency: 4
+  sort-results: true
+  allow-parallel-runners: true
+  tests: true
+
 linters:
   disable-all: true
   enable:
-    - deadcode
     - depguard
     - dogsled
     - dupl
@@ -25,9 +32,5 @@ linters:
     - revive
     - unconvert
     - unused
-    - varcheck
     - nolintlint
 
-run:
-  build-tags:
-    - rocksdb

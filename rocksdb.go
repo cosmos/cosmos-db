@@ -78,7 +78,7 @@ func NewRocksDBWithOptions(name string, dir string, opts *grocksdb.Options) (*Ro
 // or customize the default read/write options.
 func NewRocksDBWithRaw(
 	db *grocksdb.DB, ro *grocksdb.ReadOptions,
-	wo *grocksdb.WriteOptions, woSync *grocksdb.WriteOptions
+	wo *grocksdb.WriteOptions, woSync *grocksdb.WriteOptions,
 ) *RocksDB {
 	return &RocksDB{
 		db:     db,

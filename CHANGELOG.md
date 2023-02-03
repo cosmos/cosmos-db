@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+
+## [v1.0.0] - 2023-02-*
+
+> Note this repository was forked from [github.com/tendermint/tm-db](https://github.com/tendermint/tm-db). Minor modifications were made after the fork to better support the Cosmos SDK. 
 
 - added bloom filter:  https://github.com/cosmos/cosmos-db/pull/42/files
 - Removed Badger & Boltdb

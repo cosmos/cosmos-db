@@ -18,11 +18,11 @@ Go 1.19+
 
 - **MemDB [stable]:** An in-memory database using [Google's B-tree package](https://github.com/google/btree). Has very high performance both for reads, writes, and range scans, but is not durable and will lose all data on process exit. Does not support transactions. Suitable for e.g. caches, working sets, and tests. Used for [IAVL](https://github.com/tendermint/iavl) working sets when the pruning strategy allows it.
 
-- **[GoLevelDB](https://github.com/syndtr/goleveldb) [stable]**: a pure Go implementation of [LevelDB](https://github.com/google/leveldb) (see below). Currently the default on-disk database used in the Cosmos SDK.
+- **[GoLevelDB](https://github.com/syndtr/goleveldb)**: a pure Go implementation of [LevelDB](https://github.com/google/leveldb) (see below). Currently the default on-disk database used in the Cosmos SDK.
 
-- **[LevelDB](https://github.com/google/leveldb) [experimental]** using [levigo Go wrapper](https://github.com/jmhodges/levigo). Uses LSM-trees for on-disk storage, which have good performance for write-heavy workloads, particularly on spinning disks, but requires periodic compaction to maintain decent read performance and reclaim disk space. Does not support transactions.
+- **[LevelDB](https://github.com/google/leveldb)** using [levigo Go wrapper](https://github.com/jmhodges/levigo). Uses LSM-trees for on-disk storage, which have good performance for write-heavy workloads, particularly on spinning disks, but requires periodic compaction to maintain decent read performance and reclaim disk space. Does not support transactions.
 
-- **[RocksDB](https://github.com/cosmos/gorocksdb) [experimental]:** A [Go wrapper](https://github.com/cosmos/gorocksdb) around [RocksDB](https://rocksdb.org). Similarly to LevelDB (above) it uses LSM-trees for on-disk storage, but is optimized for fast storage media such as SSDs and memory. Supports atomic transactions, but not full ACID transactions.
+- **[RocksDB](https://github.com/cosmos/gorocksdb):** A [Go wrapper](https://github.com/cosmos/gorocksdb) around [RocksDB](https://rocksdb.org). Similarly to LevelDB (above) it uses LSM-trees for on-disk storage, but is optimized for fast storage media such as SSDs and memory. Supports atomic transactions, but not full ACID transactions.
 
 - **[Pebble](https://github.com/cockroachdb/pebble):** a RocksDB/LevelDB inspired key-value database in Go using RocksDB file format and LSM-trees for on-disk storage. Supports snapshots.
 

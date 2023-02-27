@@ -8,7 +8,8 @@ require (
 	github.com/linxGnu/grocksdb v1.7.15
 	github.com/spf13/cast v1.5.0
 	github.com/stretchr/testify v1.8.1
-	github.com/syndtr/goleveldb v1.0.1-0.20200815110645-5c35d600f0ca
+	// Pinned to this version to avoid bugs in following commits. See https://github.com/cosmos/cosmos-sdk/pull/14952
+	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 )
 
 require (
@@ -34,6 +35,3 @@ require (
 	golang.org/x/sys v0.0.0-20220817070843-5a390386f1f2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-// Downgraded to avoid bugs in following commits. See https://github.com/cosmos/cosmos-sdk/pull/14952
-replace github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7

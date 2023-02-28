@@ -7,7 +7,7 @@ require (
 	github.com/google/btree v1.1.2
 	github.com/linxGnu/grocksdb v1.7.15
 	github.com/spf13/cast v1.5.0
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 	// Pinned to this version to avoid bugs in following commits. See https://github.com/cosmos/cosmos-sdk/pull/14952
 	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 )

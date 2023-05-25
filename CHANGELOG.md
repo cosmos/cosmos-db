@@ -1,6 +1,6 @@
 # Changelog
 
-## [v1.0.0] - 2023-02-*
+## [v1.0.0] - 2023-05-25
 
 > Note this repository was forked from [github.com/tendermint/tm-db](https://github.com/tendermint/tm-db). Minor modifications were made after the fork to better support the Cosmos SDK. Notably, this repo removes badger, boltdb and cleveldb.
 

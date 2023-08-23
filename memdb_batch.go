@@ -1,6 +1,8 @@
 package db
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // memDBBatch operations
 type opType int
@@ -68,8 +70,6 @@ func (b *memDBBatch) Write() error {
 	if b.ops == nil {
 		return errBatchClosed
 	}
-	b.db.mtx.Lock()
-	defer b.db.mtx.Unlock()
 
 	for _, op := range b.ops {
 		switch op.opType {

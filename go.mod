@@ -4,13 +4,14 @@ go 1.19
 
 require (
 	github.com/cockroachdb/pebble v0.0.0-20220817183557-09c6e030a677
-	github.com/google/btree v1.1.2
 	github.com/linxGnu/grocksdb v1.7.15
 	github.com/spf13/cast v1.5.1
 	github.com/stretchr/testify v1.8.3
 	// Pinned to this version to avoid bugs in following commits. See https://github.com/cosmos/cosmos-sdk/pull/14952
 	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 )
+
+require github.com/tidwall/btree v1.6.0
 
 require (
 	github.com/DataDog/zstd v1.4.5 // indirect

@@ -2,9 +2,8 @@ package db
 
 import (
 	"bytes"
-	"context"
 
-	"github.com/google/btree"
+	"github.com/tidwall/btree"
 )
 
 const (
@@ -16,98 +15,70 @@ const (
 
 // memDBIterator is a memDB iterator.
 type memDBIterator struct {
-	ch     <-chan *item
-	cancel context.CancelFunc
-	item   *item
-	start  []byte
-	end    []byte
-	useMtx bool
+	iter btree.IterG[item]
+
+	start     []byte
+	end       []byte
+	ascending bool
+	valid     bool
 }
 
 var _ Iterator = (*memDBIterator)(nil)
 
 // newMemDBIterator creates a new memDBIterator.
-func newMemDBIterator(db *MemDB, start []byte, end []byte, reverse bool) *memDBIterator {
-	return newMemDBIteratorMtxChoice(db, start, end, reverse, true)
+func newMemDBIterator(start, end []byte, items MemDB, ascending bool) *memDBIterator {
+	iter := items.btree.Iter()
+	var valid bool
+	if ascending {
+		if start != nil {
+			valid = iter.Seek(newItem(start, nil))
+		} else {
+			valid = iter.First()
+		}
+	} else {
+		if end != nil {
+			valid = iter.Seek(newItem(end, nil))
+			if !valid {
+				valid = iter.Last()
+			} else {
+				// end is exclusive
+				valid = iter.Prev()
+			}
+		} else {
+			valid = iter.Last()
+		}
+	}
+
+	mi := &memDBIterator{
+		iter:      iter,
+		start:     start,
+		end:       end,
+		ascending: ascending,
+		valid:     valid,
+	}
+
+	if mi.valid {
+		mi.valid = mi.keyInRange(mi.Key())
+	}
+
+	return mi
 }
 
-func newMemDBIteratorMtxChoice(db *MemDB, start []byte, end []byte, reverse bool, useMtx bool) *memDBIterator {
-	ctx, cancel := context.WithCancel(context.Background())
-	ch := make(chan *item, chBufferSize)
-	iter := &memDBIterator{
-		ch:     ch,
-		cancel: cancel,
-		start:  start,
-		end:    end,
-		useMtx: useMtx,
+func (mi *memDBIterator) keyInRange(key []byte) bool {
+	if mi.ascending && mi.end != nil && bytes.Compare(key, mi.end) >= 0 {
+		return false
 	}
-
-	if useMtx {
-		db.mtx.RLock()
+	if !mi.ascending && mi.start != nil && bytes.Compare(key, mi.start) < 0 {
+		return false
 	}
-	go func() {
-		if useMtx {
-			defer db.mtx.RUnlock()
-		}
-		// Because we use [start, end) for reverse ranges, while btree uses (start, end], we need
-		// the following variables to handle some reverse iteration conditions ourselves.
-		var (
-			skipEqual     []byte
-			abortLessThan []byte
-		)
-		visitor := func(i btree.Item) bool {
-			item := i.(item)
-			if skipEqual != nil && bytes.Equal(item.key, skipEqual) {
-				skipEqual = nil
-				return true
-			}
-			if abortLessThan != nil && bytes.Compare(item.key, abortLessThan) == -1 {
-				return false
-			}
-			select {
-			case <-ctx.Done():
-				return false
-			case ch <- &item:
-				return true
-			}
-		}
-		switch {
-		case start == nil && end == nil && !reverse:
-			db.btree.Ascend(visitor)
-		case start == nil && end == nil && reverse:
-			db.btree.Descend(visitor)
-		case end == nil && !reverse:
-			// must handle this specially, since nil is considered less than anything else
-			db.btree.AscendGreaterOrEqual(newKey(start), visitor)
-		case !reverse:
-			db.btree.AscendRange(newKey(start), newKey(end), visitor)
-		case end == nil:
-			// abort after start, since we use [start, end) while btree uses (start, end]
-			abortLessThan = start
-			db.btree.Descend(visitor)
-		default:
-			// skip end and abort after start, since we use [start, end) while btree uses (start, end]
-			skipEqual = end
-			abortLessThan = start
-			db.btree.DescendLessOrEqual(newKey(end), visitor)
-		}
-		close(ch)
-	}()
-
-	// prime the iterator with the first value, if any
-	if item, ok := <-ch; ok {
-		iter.item = item
-	}
-
-	return iter
+	return true
 }
 
 // Close implements Iterator.
 func (i *memDBIterator) Close() error {
-	i.cancel()
-	for range i.ch { // drain channel
-	}
-	i.item = nil
+
+	i.iter.Release()
+
 	return nil
 }
 
@@ -118,18 +89,27 @@ func (i *memDBIterator) Domain() ([]byte, []byte) {
 
 // Valid implements Iterator.
 func (i *memDBIterator) Valid() bool {
-	return i.item != nil
+	return i.valid
 }
 
 // Next implements Iterator.
-func (i *memDBIterator) Next() {
-	i.assertIsValid()
-	item, ok := <-i.ch
-	switch {
-	case ok:
-		i.item = item
-	default:
-		i.item = nil
+func (mi *memDBIterator) Next() {
+	mi.assertValid()
+
+	if mi.ascending {
+		mi.valid = mi.iter.Next()
+	} else {
+		mi.valid = mi.iter.Prev()
+	}
+
+	if mi.valid {
+		mi.valid = mi.keyInRange(mi.Key())
+	}
+}
+
+func (mi *memDBIterator) assertValid() {
+	if err := mi.Error(); err != nil {
+		panic(err)
 	}
 }
 
@@ -141,13 +121,13 @@ func (i *memDBIterator) Error() error {
 // Key implements Iterator.
 func (i *memDBIterator) Key() []byte {
 	i.assertIsValid()
-	return i.item.key
+	return i.iter.Item().key
 }
 
 // Value implements Iterator.
 func (i *memDBIterator) Value() []byte {
 	i.assertIsValid()
-	return i.item.value
+	return i.iter.Item().value
 }
 
 func (i *memDBIterator) assertIsValid() {

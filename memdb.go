@@ -3,34 +3,14 @@ package db
 import (
 	"bytes"
 	"fmt"
-	"sync"
 
-	"github.com/google/btree"
+	"github.com/tidwall/btree"
 )
 
 const (
 	// The approximate number of items and children per B-tree node. Tuned with benchmarks.
 	bTreeDegree = 32
 )
-
-func init() {
-	registerDBCreator(MemDBBackend, func(name, dir string, opts Options) (DB, error) {
-		return NewMemDB(), nil
-	}, false)
-}
-
-// item is a btree.Item with byte slices as keys and values
-type item struct {
-	key   []byte
-	value []byte
-}
-
-// Less implements btree.Item.
-func (i item) Less(other btree.Item) bool {
-	// this considers nil == []byte{}, but that's ok since we handle nil endpoints
-	// in iterators specially anyway
-	return bytes.Compare(i.key, other.(item).key) == -1
-}
 
 // newKey creates a new key item.
 func newKey(key []byte) item {
@@ -49,8 +29,7 @@ func newPair(key, value []byte) item {
 // already specify that keys and values should be considered read-only, but this is especially
 // important with MemDB.
 type MemDB struct {
-	mtx   sync.RWMutex
-	btree *btree.BTree
+	btree *btree.BTreeG[item]
 }
 
 var _ DB = (*MemDB)(nil)
@@ -58,7 +37,10 @@ var _ DB = (*MemDB)(nil)
 // NewMemDB creates a new in-memory database.
 func NewMemDB() *MemDB {
 	database := &MemDB{
-		btree: btree.New(bTreeDegree),
+		btree: btree.NewBTreeGOptions(byKeys, btree.Options{
+			Degree:  bTreeDegree,
+			NoLocks: false,
+		}),
 	}
 	return database
 }
@@ -68,14 +50,12 @@ func (db *MemDB) Get(key []byte) ([]byte, error) {
 	if len(key) == 0 {
 		return nil, errKeyEmpty
 	}
-	db.mtx.RLock()
-	defer db.mtx.RUnlock()
 
-	i := db.btree.Get(newKey(key))
-	if i != nil {
-		return i.(item).value, nil
+	i, found := db.btree.Get(newKey(key))
+	if !found {
+		return i.value, nil
 	}
-	return nil, nil
+	return i.value, nil
 }
 
 // Has implements DB.
@@ -83,10 +63,10 @@ func (db *MemDB) Has(key []byte) (bool, error) {
 	if len(key) == 0 {
 		return false, errKeyEmpty
 	}
-	db.mtx.RLock()
-	defer db.mtx.RUnlock()
 
-	return db.btree.Has(newKey(key)), nil
+	_, found := db.btree.Get(newKey(key))
+
+	return found, nil
 }
 
 // Set implements DB.
@@ -97,8 +77,6 @@ func (db *MemDB) Set(key []byte, value []byte) error {
 	if value == nil {
 		return errValueNil
 	}
-	db.mtx.Lock()
-	defer db.mtx.Unlock()
 
 	db.set(key, value)
 	return nil
@@ -106,7 +84,7 @@ func (db *MemDB) Set(key []byte, value []byte) error {
 
 // set sets a value without locking the mutex.
 func (db *MemDB) set(key []byte, value []byte) {
-	db.btree.ReplaceOrInsert(newPair(key, value))
+	db.btree.Set(newPair(key, value))
 }
 
 // SetSync implements DB.
@@ -119,8 +97,6 @@ func (db *MemDB) Delete(key []byte) error {
 	if len(key) == 0 {
 		return errKeyEmpty
 	}
-	db.mtx.Lock()
-	defer db.mtx.Unlock()
 
 	db.delete(key)
 	return nil
@@ -146,21 +122,23 @@ func (db *MemDB) Close() error {
 
 // Print implements DB.
 func (db *MemDB) Print() error {
-	db.mtx.RLock()
-	defer db.mtx.RUnlock()
+	iterator := newMemDBIterator(nil, nil, *db, true)
 
-	db.btree.Ascend(func(i btree.Item) bool {
-		item := i.(item)
-		fmt.Printf("[%X]:\t[%X]\n", item.key, item.value)
-		return true
-	})
+	valid := true
+	for valid {
+		if !iterator.valid {
+			valid = false
+		}
+
+		fmt.Printf("[%X]:\t[%X]\n", iterator.Key(), iterator.Value())
+		iterator.Next()
+	}
+
 	return nil
 }
 
 // Stats implements DB.
 func (db *MemDB) Stats() map[string]string {
-	db.mtx.RLock()
-	defer db.mtx.RUnlock()
 
 	stats := make(map[string]string)
 	stats["database.type"] = "memDB"
@@ -185,7 +163,7 @@ func (db *MemDB) Iterator(start, end []byte) (Iterator, error) {
 	if (start != nil && len(start) == 0) || (end != nil && len(end) == 0) {
 		return nil, errKeyEmpty
 	}
-	return newMemDBIterator(db, start, end, false), nil
+	return newMemDBIterator(start, end, *db, true), nil
 }
 
 // ReverseIterator implements DB.
@@ -194,21 +172,21 @@ func (db *MemDB) ReverseIterator(start, end []byte) (Iterator, error) {
 	if (start != nil && len(start) == 0) || (end != nil && len(end) == 0) {
 		return nil, errKeyEmpty
 	}
-	return newMemDBIterator(db, start, end, true), nil
+	return newMemDBIterator(start, end, *db, false), nil
 }
 
-// IteratorNoMtx makes an iterator with no mutex.
-func (db *MemDB) IteratorNoMtx(start, end []byte) (Iterator, error) {
-	if (start != nil && len(start) == 0) || (end != nil && len(end) == 0) {
-		return nil, errKeyEmpty
-	}
-	return newMemDBIteratorMtxChoice(db, start, end, false, false), nil
+// item is a btree item with byte slices as keys and values
+type item struct {
+	key   []byte
+	value []byte
 }
 
-// ReverseIteratorNoMtx makes an iterator with no mutex.
-func (db *MemDB) ReverseIteratorNoMtx(start, end []byte) (Iterator, error) {
-	if (start != nil && len(start) == 0) || (end != nil && len(end) == 0) {
-		return nil, errKeyEmpty
-	}
-	return newMemDBIteratorMtxChoice(db, start, end, true, false), nil
+// byKeys compares the items by key
+func byKeys(a, b item) bool {
+	return bytes.Compare(a.key, b.key) == -1
+}
+
+// newItem creates a new pair item.
+func newItem(key, value []byte) item {
+	return item{key: key, value: value}
 }

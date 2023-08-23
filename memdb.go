@@ -12,6 +12,12 @@ const (
 	bTreeDegree = 32
 )
 
+func init() {
+	registerDBCreator(MemDBBackend, func(name, dir string, opts Options) (DB, error) {
+		return NewMemDB(), nil
+	}, false)
+}
+
 // newKey creates a new key item.
 func newKey(key []byte) item {
 	return item{key: key}

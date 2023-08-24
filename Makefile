@@ -4,7 +4,7 @@ all: lint test
 ## By default this will only test memdb, goleveldb, and pebbledb, which do not require cgo
 test:
 	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags pebbledb -v
+	@go test $(PACKAGES) -v
 
 test-rocksdb:
 	@echo "--> Running go test"

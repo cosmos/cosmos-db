@@ -1,5 +1,5 @@
 {
-    "go.buildTags": "cleveldb rocksdb pebbledb",
+    "go.buildTags": " pebbledb",
     "go.lintTool": "golangci-lint",
     "go.lintOnSave": "workspace",
     "go.formatTool": "gofumpt"

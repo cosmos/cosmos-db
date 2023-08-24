@@ -93,17 +93,17 @@ func (i *memDBIterator) Valid() bool {
 }
 
 // Next implements Iterator.
-func (mi *memDBIterator) Next() {
-	mi.assertValid()
+func (i *memDBIterator) Next() {
+	i.assertValid()
 
-	if mi.ascending {
-		mi.valid = mi.iter.Next()
+	if i.ascending {
+		i.valid = i.iter.Next()
 	} else {
-		mi.valid = mi.iter.Prev()
+		i.valid = i.iter.Prev()
 	}
 
-	if mi.valid {
-		mi.valid = mi.keyInRange(mi.Key())
+	if i.valid {
+		i.valid = !i.keyInRange(i.Key())
 	}
 }
 
@@ -115,18 +115,18 @@ func (mi *memDBIterator) assertValid() {
 
 // Error implements Iterator.
 func (i *memDBIterator) Error() error {
-	return nil // famous last words
+	return nil
 }
 
 // Key implements Iterator.
 func (i *memDBIterator) Key() []byte {
-	i.assertIsValid()
+	i.assertValid()
 	return i.iter.Item().key
 }
 
 // Value implements Iterator.
 func (i *memDBIterator) Value() []byte {
-	i.assertIsValid()
+	i.assertValid()
 	return i.iter.Item().value
 }
 

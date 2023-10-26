@@ -177,11 +177,7 @@ func (db *PebbleDB) Delete(key []byte) error {
 	if isForceSync {
 		wopts = pebble.Sync
 	}
-	err := db.db.Delete(key, wopts)
-	if err != nil {
-		return err
-	}
-	return nil
+	return db.db.Delete(key, wopts)
 }
 
 // DeleteSync implements DB.
@@ -190,11 +186,7 @@ func (db PebbleDB) DeleteSync(key []byte) error {
 	if len(key) == 0 {
 		return errKeyEmpty
 	}
-	err := db.db.Delete(key, pebble.Sync)
-	if err != nil {
-		return nil
-	}
-	return nil
+	return db.db.Delete(key, pebble.Sync)
 }
 
 func (db *PebbleDB) DB() *pebble.DB {
@@ -488,11 +480,7 @@ func (itr *pebbleDBIterator) Error() error {
 // Close implements Iterator.
 func (itr *pebbleDBIterator) Close() error {
 	// fmt.Println("pebbleDBIterator.Close")
-	err := itr.source.Close()
-	if err != nil {
-		return err
-	}
-	return nil
+	return itr.source.Close()
 }
 
 func (itr *pebbleDBIterator) assertIsValid() {

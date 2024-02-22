@@ -11,5 +11,5 @@ jobs:
     container: ghcr.io/cosmos/cosmos-db/build-test:latest
     steps:
       - uses: actions/checkout@v4
-      - uses: golangci/golangci-lint-action@v3.7.0
+      - uses: golangci/golangci-lint-action@v4.0.0
 

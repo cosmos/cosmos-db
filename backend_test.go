@@ -26,7 +26,7 @@ func init() {
 }
 
 func cleanupDBDir(dir, name string) {
-	err := os.RemoveAll(filepath.Join(dir, name) + ".db")
+	err := os.RemoveAll(filepath.Join(dir, name) + DBFileSuffix)
 	if err != nil {
 		panic(err)
 	}

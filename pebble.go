@@ -86,7 +86,7 @@ func NewPebbleDB(name string, dir string, opts Options) (DB, error) {
 		}
 	}
 
-	dbPath := filepath.Join(dir, name+".db")
+	dbPath := filepath.Join(dir, name+DBFileSuffix)
 	p, err := pebble.Open(dbPath, do)
 	if err != nil {
 		return nil, err

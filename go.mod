@@ -1,11 +1,11 @@
 module github.com/cosmos/cosmos-db
 
-go 1.19
+go 1.22
 
 require (
 	github.com/cockroachdb/pebble v1.1.0
 	github.com/google/btree v1.1.2
-	github.com/linxGnu/grocksdb v1.8.0
+	github.com/linxGnu/grocksdb v1.8.12
 	github.com/spf13/cast v1.6.0
 	github.com/stretchr/testify v1.8.4
 	// Pinned to this version to avoid bugs in following commits. See https://github.com/cosmos/cosmos-sdk/pull/14952

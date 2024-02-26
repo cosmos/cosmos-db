@@ -1,6 +1,6 @@
 module github.com/cosmos/cosmos-db
 
-go 1.22
+go 1.19
 
 require (
 	github.com/cockroachdb/pebble v1.1.0

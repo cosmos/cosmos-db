@@ -2,9 +2,9 @@ package db
 
 import (
 	"bytes"
+	"crypto/rand"
 	"encoding/binary"
 	"fmt"
-	"math/rand"
 	"path/filepath"
 	"sync"
 	"testing"
@@ -32,7 +32,7 @@ func taskKey(i, k int) []byte {
 
 func randomValue() []byte {
 	b := make([]byte, 16)
-	rand.Read(b) //nolint:staticcheck,gosec
+	rand.Read(b)
 	return b
 }
 

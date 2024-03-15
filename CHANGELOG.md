@@ -1,5 +1,9 @@
 # Changelog
 
+## UNRELEASED
+
+* Allow full control in rocksdb opening
+
 ## [v1.0.2] - 2024-02-26
 
 * Downgrade Go version in go.mod to 1.19

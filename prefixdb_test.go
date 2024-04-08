@@ -2,9 +2,9 @@ package db
 
 import (
 	"bytes"
+	"crypto/rand"
 	"encoding/binary"
 	"fmt"
-	"math/rand"
 	"path/filepath"
 	"sync"
 	"testing"
@@ -32,7 +32,10 @@ func taskKey(i, k int) []byte {
 
 func randomValue() []byte {
 	b := make([]byte, 16)
-	rand.Read(b) //nolint:staticcheck,gosec
+	_, err := rand.Read(b)
+	if err != nil {
+	    panic(fmt.Sprintf("random value generation failed: %v", err))
+	}
 	return b
 }
 

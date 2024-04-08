@@ -32,7 +32,10 @@ func taskKey(i, k int) []byte {
 
 func randomValue() []byte {
 	b := make([]byte, 16)
-	rand.Read(b)
+	_, err := rand.Read(b)
+	if err != nil {
+	    panic(fmt.Sprintf("random value generation failed: %v", err))
+	}
 	return b
 }
 

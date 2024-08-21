@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/cockroachdb/pebble v1.1.0
-	github.com/google/btree v1.1.2
+	github.com/google/btree v1.1.3
 	github.com/linxGnu/grocksdb v1.8.12
 	github.com/spf13/cast v1.6.0
 	github.com/stretchr/testify v1.8.4

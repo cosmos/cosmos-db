@@ -1,5 +1,3 @@
-//go:build pebbledb
-
 package db
 
 import (
@@ -34,7 +32,7 @@ git reset --hard
 git checkout v0.14.0
 go mod edit -replace github.com/tendermint/tm-db=github.com/baabeetaa/tm-db@pebble
 go mod tidy
-go install -tags pebbledb -ldflags "-w -s -X github.com/cosmos/cosmos-sdk/types.DBBackend=pebbledb -X github.com/tendermint/tm-db.ForceSync=1" ./cmd/sifnoded
+go install -ldflags "-w -s -X github.com/cosmos/cosmos-sdk/types.DBBackend=pebbledb -X github.com/tendermint/tm-db.ForceSync=1" ./cmd/sifnoded
 
 $HOME/go/bin/sifnoded start --db_backend=pebbledb
 
@@ -44,7 +42,7 @@ git reset --hard
 git checkout v0.15.0
 go mod edit -replace github.com/tendermint/tm-db=github.com/baabeetaa/tm-db@pebble
 go mod tidy
-go install -tags pebbledb -ldflags "-w -s -X github.com/cosmos/cosmos-sdk/types.DBBackend=pebbledb" ./cmd/sifnoded
+go install -ldflags "-w -s -X github.com/cosmos/cosmos-sdk/types.DBBackend=pebbledb" ./cmd/sifnoded
 
 $HOME/go/bin/sifnoded start --db_backend=pebbledb
 

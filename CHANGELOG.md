@@ -1,9 +1,10 @@
 # Changelog
 
-## UNRELEASED
+## [v1.1.0] - 2024-11-22
 
 * Allow full control in rocksdb opening
 * Make `Iteractor` and `Batch` interfaces more flexible by a type alias
+* Remove alias for PebbleDB
 
 ## [v1.0.2] - 2024-02-26
 

@@ -17,14 +17,13 @@ const (
 	// MemDBBackend represents in-memory key value store, which is mostly used
 	// for testing.
 	MemDBBackend BackendType = "memdb"
+	// PebbleDBDBBackend represents pebble (uses github.com/cockroachdb/pebble)
+	//   - pure go
+	PebbleDBBackend BackendType = "pebbledb"
 	// RocksDBBackend represents rocksdb (uses github.com/linxGnu/grocksdb)
 	//   - requires gcc
 	//   - use rocksdb build tag (go build -tags rocksdb)
 	RocksDBBackend BackendType = "rocksdb"
-	// PebbleDBDBBackend represents pebble (uses github.com/cockroachdb/pebble)
-	//   - pure go
-	//   - use pebble build tag (go build -tags pebbledb)
-	PebbleDBBackend BackendType = "pebbledb"
 )
 
 type (

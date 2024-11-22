@@ -43,3 +43,7 @@ require (
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+// grocksdb stays at v1.8.x in cosmos-db as it should support RocksDB v8.
+// the cosmos sdk v2 uses directly store/v2 which uses RocksDB v9 from 0.52+
+replace github.com/linxGnu/grocksdb => github.com/linxGnu/grocksdb v1.8.12

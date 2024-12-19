@@ -72,6 +72,7 @@ var _ DB = (*PebbleDB)(nil)
 
 func NewPebbleDB(name string, dir string, opts Options) (DB, error) {
 	do := &pebble.Options{
+		Logger:                   &fatalLogger{},          // pebble info logs are messing up the logs (not a cosmossdk.io/log logger)
 		MaxConcurrentCompactions: func() int { return 3 }, // default 1
 	}
 
@@ -96,7 +97,6 @@ func NewPebbleDB(name string, dir string, opts Options) (DB, error) {
 
 // Get implements DB.
 func (db *PebbleDB) Get(key []byte) ([]byte, error) {
-	// fmt.Println("PebbleDB.Get")
 	if len(key) == 0 {
 		return nil, errKeyEmpty
 	}
@@ -492,3 +492,13 @@ func (itr *pebbleDBIterator) assertIsValid() {
 		panic("iterator is invalid")
 	}
 }
+
+type fatalLogger struct {
+	pebble.Logger
+}
+
+func (*fatalLogger) Fatalf(format string, args ...interface{}) {
+	pebble.DefaultLogger.Fatalf(format, args...)
+}
+
+func (*fatalLogger) Infof(format string, args ...interface{}) {}

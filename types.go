@@ -107,7 +107,7 @@ type BatchI interface {
 	GetByteSize() (int, error)
 }
 
-type Batch = IBatch
+type Batch = BatchI
 
 // Iterator represents an iterator over a domain of keys. Callers must call Close when done.
 // No writes can happen to a domain while there exists an iterator over it, some backends may take
@@ -160,4 +160,4 @@ type IteratorI interface {
 	Close() error
 }
 
-type Iterator = IIterator
+type Iterator = IteratorI

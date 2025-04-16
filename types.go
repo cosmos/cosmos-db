@@ -81,7 +81,7 @@ type DB interface {
 //
 // As with DB, given keys and values should be considered read-only, and must not be modified after
 // passing them to the batch.
-type IBatch interface {
+type BatchI interface {
 	// Set sets a key/value pair.
 	// CONTRACT: key, value readonly []byte
 	Set(key, value []byte) error
@@ -132,7 +132,7 @@ type Batch = IBatch
 //	if err := itr.Error(); err != nil {
 //	  ...
 //	}
-type IIterator interface {
+type IteratorI interface {
 	// Domain returns the start (inclusive) and end (exclusive) limits of the iterator.
 	// CONTRACT: start, end readonly []byte
 	Domain() (start []byte, end []byte)

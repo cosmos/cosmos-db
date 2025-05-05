@@ -34,7 +34,7 @@ func randomValue() []byte {
 	b := make([]byte, 16)
 	_, err := rand.Read(b)
 	if err != nil {
-	    panic(fmt.Sprintf("random value generation failed: %v", err))
+		panic(fmt.Sprintf("random value generation failed: %v", err))
 	}
 	return b
 }

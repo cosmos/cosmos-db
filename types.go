@@ -156,7 +156,7 @@ type IteratorI interface {
 	// Error returns the last error encountered by the iterator, if any.
 	Error() error
 
-	// Close closes the iterator, relasing any allocated resources.
+	// Close closes the iterator, releasing any allocated resources.
 	Close() error
 }
 

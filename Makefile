@@ -18,14 +18,14 @@ lint-install:
 	@go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(golangci_version)
 .PHONY: lint-install
 
-lint:
+lint: lint-install
 	@echo "--> Running linter"
-	$(MAKE) lint-install
 	@golangci-lint run
 	@go mod verify
-.PHONY: lint
 
-format:
-	find . -name '*.go' -type f -not -path "*.git*"  -not -name '*.pb.go' -not -name '*pb_test.go' | xargs gofumpt -w -l .
-	find . -name '*.go' -type f -not -path "*.git*"  -not -name '*.pb.go' -not -name '*pb_test.go' | xargs golangci-lint run --fix .
-.PHONY: format
+lint-fix: lint-install
+	@echo "--> Running linter"
+	@golangci-lint run --fix
+	@go mod verify
+
+.PHONY: lint lint-fix

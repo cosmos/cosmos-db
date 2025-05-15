@@ -27,16 +27,16 @@ const (
 )
 
 type (
-	dbCreator func(name, dir string, opts Options) (DB, error)
+	dbCreatorFn func(name, dir string, opts Options) (DB, error)
 
 	Options interface {
 		Get(string) any
 	}
 )
 
-var backends = map[BackendType]dbCreator{}
+var backends = map[BackendType]dbCreatorFn{}
 
-func registerDBCreator(backend BackendType, creator dbCreator, force bool) { // nolint:unparam // we may pass a different bool value into this in the future
+func registerDBCreator(backend BackendType, creator dbCreatorFn, force bool) { // nolint:unparam // we may pass a different bool value into this in the future
 	_, ok := backends[backend]
 	if !force && ok {
 		return

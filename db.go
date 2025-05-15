@@ -36,7 +36,7 @@ type (
 
 var backends = map[BackendType]dbCreator{}
 
-func registerDBCreator(backend BackendType, creator dbCreator, force bool) {
+func registerDBCreator(backend BackendType, creator dbCreator, force bool) { // nolint:unparam // we may pass a different bool value into this in the future
 	_, ok := backends[backend]
 	if !force && ok {
 		return

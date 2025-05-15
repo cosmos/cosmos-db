@@ -35,7 +35,7 @@ type prefixDBIterator struct {
 
 var _ Iterator = (*prefixDBIterator)(nil)
 
-func newPrefixIterator(prefix, start, end []byte, source Iterator) (*prefixDBIterator, error) {
+func newPrefixIterator(prefix, start, end []byte, source Iterator) (*prefixDBIterator, error) { // nolint:unparam // reserving the possibility to error in the future
 	pitrInvalid := &prefixDBIterator{
 		prefix: prefix,
 		start:  start,

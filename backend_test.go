@@ -13,7 +13,7 @@ import (
 
 // Register a test backend for PrefixDB as well, with some unrelated junk data
 func init() {
-	registerDBCreator("prefixdb", func(name, dir string, opts Options) (DB, error) {
+	registerDBCreator("prefixdb", func(_, _ string, _ Options) (DB, error) {
 		mdb := NewMemDB()
 		mdb.Set([]byte("a"), []byte{1})    //nolint:errcheck
 		mdb.Set([]byte("b"), []byte{2})    //nolint:errcheck
@@ -353,8 +353,8 @@ func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
 	totalSizeOfKeyAndValue := 0
 	// set 100 random keys and values
 	for i := 0; i < 100; i++ {
-		keySize := rand.Intn(32) + 1   //nolint:gosec
-		valueSize := rand.Intn(32) + 1 //nolint:gosec
+		keySize := rand.Intn(32) + 1
+		valueSize := rand.Intn(32) + 1
 		totalSizeOfKeyAndValue += keySize + valueSize
 		require.NoError(t, batch.Set([]byte(randStr(keySize)), []byte(randStr(valueSize))))
 	}

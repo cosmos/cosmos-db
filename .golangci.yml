@@ -1,34 +1,73 @@
+version: "2"
 run:
-  build-tags:
-    - rocksdb
-  concurrency: 4
-  sort-results: true
-  allow-parallel-runners: true
   tests: true
-
 linters:
-  disable-all: true
+  default: none
   enable:
+    - bodyclose
     - dogsled
-    - dupl
     - errcheck
-    - exportloopref
     - goconst
     - gocritic
-    - gofumpt
-    - revive
     - gosec
-    - gosimple
     - govet
     - ineffassign
-    - lll
     - misspell
     - nakedret
-    - prealloc
-    - staticcheck
-    - stylecheck
-    - typecheck
-    - revive
-    - unconvert
-    - unused
     - nolintlint
+    - prealloc
+    - revive
+    - staticcheck
+    - unconvert
+    - unparam
+    - unused
+  settings:
+    nolintlint:
+      require-explanation: false
+      require-specific: true
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - gosec
+        text: Use of weak random number generator
+      - linters:
+          - golint
+        text: comment on exported var
+      - linters:
+          - golint
+        text: don't use an underscore in package name
+      - linters:
+          - nolintlint
+        text: should be written without leading space as
+      - linters:
+          - staticcheck
+        text: 'ST1003:'
+      - linters:
+          - staticcheck
+        text: 'ST1016:'
+      - linters:
+          - staticcheck
+        path: migrations
+        text: 'SA1019:'
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  max-issues-per-linter: 10000
+  max-same-issues: 10000
+formatters:
+  enable:
+    - gofumpt
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

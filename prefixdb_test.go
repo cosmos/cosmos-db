@@ -122,7 +122,7 @@ func Run(t *testing.T, db DB) {
 			// Delete all the keys we inserted.
 			for key := range mine {
 				bs := make([]byte, 4)
-				binary.LittleEndian.PutUint32(bs, uint32(key))
+				binary.LittleEndian.PutUint32(bs, uint32(key)) // nolint:gosec // test logic
 				if err := db.Delete(bs); err != nil {
 					t.Errorf("Delete %q: %v", key, err)
 				}

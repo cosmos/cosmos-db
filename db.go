@@ -14,10 +14,10 @@ const (
 	//   - pure go
 	//   - stable
 	GoLevelDBBackend BackendType = "goleveldb"
-	// MemDBBackend represents in-memory key value store, which is mostly used
+	// MemDBBackend represents in-memory key-value store, which is mostly used
 	// for testing.
 	MemDBBackend BackendType = "memdb"
-	// PebbleDBDBBackend represents pebble (uses github.com/cockroachdb/pebble)
+	// PebbleDBBackend represents pebble (uses github.com/cockroachdb/pebble)
 	//   - pure go
 	PebbleDBBackend BackendType = "pebbledb"
 	// RocksDBBackend represents rocksdb (uses github.com/linxGnu/grocksdb)
@@ -27,16 +27,16 @@ const (
 )
 
 type (
-	dbCreator func(name string, dir string, opts Options) (DB, error)
+	dbCreatorFn func(name, dir string, opts Options) (DB, error)
 
 	Options interface {
-		Get(string) interface{}
+		Get(string) any
 	}
 )
 
-var backends = map[BackendType]dbCreator{}
+var backends = map[BackendType]dbCreatorFn{}
 
-func registerDBCreator(backend BackendType, creator dbCreator, force bool) {
+func registerDBCreator(backend BackendType, creator dbCreatorFn, force bool) { // nolint:unparam // we may pass a different bool value into this in the future
 	_, ok := backends[backend]
 	if !force && ok {
 		return

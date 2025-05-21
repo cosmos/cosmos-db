@@ -18,21 +18,30 @@ Used as a workaround for chain-upgrade issue: At the upgrade-block, the sdk will
 closing dbs properly.
 
 Upgrade guide:
-	1. After seeing `UPGRADE "xxxx" NEED at height....`, restart current version with `-X github.com/tendermint/tm-db.ForceSync=1`
+    1. After seeing `UPGRADE "xxxx" NEED at height....`,
+       restart current version with
+       `-X github.com/tendermint/tm-db.ForceSync=1`
 	2. Restart new version as normal
 
 
 Example: Upgrading sifchain from v0.14.0 to v0.15.0
 
 # log:
-panic: UPGRADE "0.15.0" NEEDED at height: 8170210: {"binaries":{"linux/amd64":"https://github.com/Sifchain/sifnode/releases/download/v0.15.0/sifnoded-v0.15.0-linux-amd64.zip?checksum=0c03b5846c5a13dcc0d9d3127e4f0cee0aeddcf2165177b2f2e0d60dbcf1a5ea"}}
+panic: UPGRADE "0.15.0" NEEDED at height: 8170210: {
+    "binaries": {
+        "linux/amd64": "https://github.com/Sifchain/sifnode/releases/download/v0.15.0/" +
+        "sifnoded-v0.15.0-linux-amd64.zip?checksum=0c03b5846c5a13dcc0d9d3127e4f0cee0aeddcf2165177b2f2e0d60dbcf1a5ea"
+    }
+}
 
 # step1
 git reset --hard
 git checkout v0.14.0
 go mod edit -replace github.com/tendermint/tm-db=github.com/baabeetaa/tm-db@pebble
 go mod tidy
-go install -ldflags "-w -s -X github.com/cosmos/cosmos-sdk/types.DBBackend=pebbledb -X github.com/tendermint/tm-db.ForceSync=1" ./cmd/sifnoded
+go install -ldflags "-w -s \
+    -X github.com/cosmos/cosmos-sdk/types.DBBackend=pebbledb \
+    -X github.com/tendermint/tm-db.ForceSync=1" ./cmd/sifnoded
 
 $HOME/go/bin/sifnoded start --db_backend=pebbledb
 
@@ -53,10 +62,7 @@ var (
 )
 
 func init() {
-	dbCreator := func(name string, dir string, opts Options) (DB, error) {
-		return NewPebbleDB(name, dir, opts)
-	}
-	registerDBCreator(PebbleDBBackend, dbCreator, false)
+	registerDBCreator(PebbleDBBackend, NewPebbleDB, false)
 
 	if ForceSync == "1" {
 		isForceSync = true
@@ -72,7 +78,8 @@ var _ DB = (*PebbleDB)(nil)
 
 func NewPebbleDB(name string, dir string, opts Options) (DB, error) {
 	do := &pebble.Options{
-		Logger:                   &fatalLogger{},          // pebble info logs are messing up the logs (not a cosmossdk.io/log logger)
+		Logger: &fatalLogger{}, // pebble info logs are messing up the logs
+		// (not a cosmossdk.io/log logger)
 		MaxConcurrentCompactions: func() int { return 3 }, // default 1
 	}
 
@@ -232,7 +239,7 @@ func (db *PebbleDB) NewBatch() Batch {
 
 // NewBatchWithSize implements DB.
 // It does the same thing as NewBatch because we can't pre-allocate pebbleDBBatch
-func (db *PebbleDB) NewBatchWithSize(size int) Batch {
+func (db *PebbleDB) NewBatchWithSize(_ int) Batch {
 	return newPebbleDBBatch(db)
 }
 
@@ -276,7 +283,6 @@ func (db *PebbleDB) ReverseIterator(start, end []byte) (Iterator, error) {
 var _ Batch = (*pebbleDBBatch)(nil)
 
 type pebbleDBBatch struct {
-	db    *PebbleDB
 	batch *pebble.Batch
 }
 
@@ -300,8 +306,7 @@ func (b *pebbleDBBatch) Set(key, value []byte) error {
 	if b.batch == nil {
 		return errBatchClosed
 	}
-	b.batch.Set(key, value, nil)
-	return nil
+	return b.batch.Set(key, value, nil)
 }
 
 // Delete implements Batch.
@@ -313,8 +318,7 @@ func (b *pebbleDBBatch) Delete(key []byte) error {
 	if b.batch == nil {
 		return errBatchClosed
 	}
-	b.batch.Delete(key, nil)
-	return nil
+	return b.batch.Delete(key, nil)
 }
 
 // Write implements Batch.
@@ -501,4 +505,4 @@ func (*fatalLogger) Fatalf(format string, args ...interface{}) {
 	pebble.DefaultLogger.Fatalf(format, args...)
 }
 
-func (*fatalLogger) Infof(format string, args ...interface{}) {}
+func (*fatalLogger) Infof(_ string, _ ...interface{}) {}

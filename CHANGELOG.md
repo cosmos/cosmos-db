@@ -17,7 +17,7 @@
 
 ## [v1.0.2] - 2024-02-26
 
-* Downgrade Go version in go.mod to 1.19
+* Downgrade Go version in `go.mod` to 1.19
 
 ## [v1.0.1] - 2024-02-25
 

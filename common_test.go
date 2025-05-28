@@ -7,7 +7,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,17 +14,23 @@ import (
 // Helper functions.
 
 func checkValue(t *testing.T, db DB, key, valueWanted []byte) {
+	t.Helper()
+
 	valueGot, err := db.Get(key)
-	assert.NoError(t, err)
-	assert.Equal(t, valueWanted, valueGot)
+	require.NoError(t, err)
+	require.Equal(t, valueWanted, valueGot)
 }
 
 func checkValid(t *testing.T, itr Iterator, expected bool) {
+	t.Helper()
+
 	valid := itr.Valid()
 	require.Equal(t, expected, valid)
 }
 
 func checkNext(t *testing.T, itr Iterator, expected bool) {
+	t.Helper()
+
 	itr.Next()
 	// assert.NoError(t, err) TODO: look at fixing this
 	valid := itr.Valid()
@@ -33,25 +38,33 @@ func checkNext(t *testing.T, itr Iterator, expected bool) {
 }
 
 func checkNextPanics(t *testing.T, itr Iterator) {
-	assert.Panics(t, func() { itr.Next() }, "checkNextPanics expected an error but didn't")
+	t.Helper()
+
+	require.Panics(t, func() { itr.Next() }, "checkNextPanics expected an error but didn't")
 }
 
 func checkDomain(t *testing.T, itr Iterator, start, end []byte) {
+	t.Helper()
+
 	ds, de := itr.Domain()
-	assert.Equal(t, start, ds, "checkDomain domain start incorrect")
-	assert.Equal(t, end, de, "checkDomain domain end incorrect")
+	require.Equal(t, start, ds, "checkDomain domain start incorrect")
+	require.Equal(t, end, de, "checkDomain domain end incorrect")
 }
 
 func checkItem(t *testing.T, itr Iterator, key, value []byte) {
+	t.Helper()
+
 	v := itr.Value()
 
 	k := itr.Key()
 
-	assert.Exactly(t, key, k)
-	assert.Exactly(t, value, v)
+	require.Exactly(t, key, k)
+	require.Exactly(t, value, v)
 }
 
 func checkInvalid(t *testing.T, itr Iterator) {
+	t.Helper()
+
 	checkValid(t, itr, false)
 	checkKeyPanics(t, itr)
 	checkValuePanics(t, itr)
@@ -59,11 +72,15 @@ func checkInvalid(t *testing.T, itr Iterator) {
 }
 
 func checkKeyPanics(t *testing.T, itr Iterator) {
-	assert.Panics(t, func() { itr.Key() }, "checkKeyPanics expected panic but didn't")
+	t.Helper()
+
+	require.Panics(t, func() { itr.Key() }, "checkKeyPanics expected panic but didn't")
 }
 
 func checkValuePanics(t *testing.T, itr Iterator) {
-	assert.Panics(t, func() { itr.Value() })
+	t.Helper()
+
+	require.Panics(t, func() { itr.Value() })
 }
 
 func newTempDB(t *testing.T, backend BackendType) (db DB, dbDir string) {
@@ -77,6 +94,7 @@ func newTempDB(t *testing.T, backend BackendType) (db DB, dbDir string) {
 }
 
 func benchmarkRangeScans(b *testing.B, db DB, dbSize int64) {
+	b.Helper()
 	b.StopTimer()
 
 	rangeSize := int64(10000)
@@ -109,6 +127,7 @@ func benchmarkRangeScans(b *testing.B, db DB, dbSize int64) {
 }
 
 func benchmarkRandomReadsWrites(b *testing.B, db DB) {
+	b.Helper()
 	b.StopTimer()
 
 	// create dummy data

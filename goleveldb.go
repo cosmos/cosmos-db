@@ -1,12 +1,13 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 
 	"github.com/spf13/cast"
 	"github.com/syndtr/goleveldb/leveldb"
-	"github.com/syndtr/goleveldb/leveldb/errors"
+	leveldberrors "github.com/syndtr/goleveldb/leveldb/errors"
 	"github.com/syndtr/goleveldb/leveldb/filter"
 	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/syndtr/goleveldb/leveldb/util"
@@ -58,7 +59,7 @@ func (db *GoLevelDB) Get(key []byte) ([]byte, error) {
 	}
 	res, err := db.db.Get(key, nil)
 	if err != nil {
-		if errors.Is(err, errors.ErrNotFound) {
+		if errors.Is(err, leveldberrors.ErrNotFound) {
 			return nil, nil
 		}
 		return nil, err

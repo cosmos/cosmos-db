@@ -15,12 +15,12 @@ import (
 func init() {
 	registerDBCreator("prefixdb", func(name, dir string, opts Options) (DB, error) {
 		mdb := NewMemDB()
-		mdb.Set([]byte("a"), []byte{1})    //nolint:errcheck
-		mdb.Set([]byte("b"), []byte{2})    //nolint:errcheck
-		mdb.Set([]byte("t"), []byte{20})   //nolint:errcheck
-		mdb.Set([]byte("test"), []byte{0}) //nolint:errcheck
-		mdb.Set([]byte("u"), []byte{21})   //nolint:errcheck
-		mdb.Set([]byte("z"), []byte{26})   //nolint:errcheck
+		_ = mdb.Set([]byte("a"), []byte{1})
+		_ = mdb.Set([]byte("b"), []byte{2})
+		_ = mdb.Set([]byte("t"), []byte{20})
+		_ = mdb.Set([]byte("test"), []byte{0})
+		_ = mdb.Set([]byte("u"), []byte{21})
+		_ = mdb.Set([]byte("z"), []byte{26})
 		return NewPrefixDB(mdb, []byte("test/")), nil
 	}, false)
 }
@@ -33,6 +33,8 @@ func cleanupDBDir(dir, name string) {
 }
 
 func testBackendGetSetDelete(t *testing.T, backend BackendType) {
+	t.Helper()
+
 	// Default
 	dirname, err := os.MkdirTemp("", fmt.Sprintf("test_backend_%s_", backend))
 	require.Nil(t, err)
@@ -161,6 +163,8 @@ func TestDBIterator(t *testing.T) {
 }
 
 func testDBIterator(t *testing.T, backend BackendType) {
+	t.Helper()
+
 	name := fmt.Sprintf("test_%x", randStr(12))
 	dir := os.TempDir()
 	db, err := NewDB(name, backend, dir)
@@ -317,13 +321,15 @@ func testDBIterator(t *testing.T, backend BackendType) {
 }
 
 func verifyIterator(t *testing.T, itr Iterator, expected []int64, msg string) {
+	t.Helper()
+
 	var list []int64
 	for itr.Valid() {
 		key := itr.Key()
 		list = append(list, bytes2Int64(key))
 		itr.Next()
 	}
-	assert.Equal(t, expected, list, msg)
+	require.Equal(t, expected, list, msg)
 }
 
 func TestDBBatchGetByteSize(t *testing.T) {
@@ -335,6 +341,8 @@ func TestDBBatchGetByteSize(t *testing.T) {
 }
 
 func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
+	t.Helper()
+
 	name := fmt.Sprintf("test_%x", randStr(12))
 	dir := os.TempDir()
 	db, err := NewDB(name, backend, dir)
@@ -382,6 +390,8 @@ func TestDBBatchOperations(t *testing.T) {
 }
 
 func testDBBatchOperations(t *testing.T, backend BackendType) {
+	t.Helper()
+
 	name := fmt.Sprintf("test_%x", randStr(12))
 	dir := os.TempDir()
 	db, err := NewDB(name, backend, dir)
@@ -454,6 +464,8 @@ func testDBBatchOperations(t *testing.T, backend BackendType) {
 }
 
 func assertKeyValues(t *testing.T, db DB, expect map[string][]byte) {
+	t.Helper()
+
 	iter, err := db.Iterator(nil, nil)
 	require.NoError(t, err)
 	defer iter.Close()
@@ -464,5 +476,5 @@ func assertKeyValues(t *testing.T, db DB, expect map[string][]byte) {
 		actual[string(iter.Key())] = iter.Value()
 	}
 
-	assert.Equal(t, expect, actual)
+	require.Equal(t, expect, actual)
 }

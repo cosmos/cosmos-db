@@ -76,7 +76,7 @@ type PebbleDB struct {
 
 var _ DB = (*PebbleDB)(nil)
 
-func NewPebbleDB(name string, dir string, opts Options) (DB, error) {
+func NewPebbleDB(name, dir string, opts Options) (DB, error) {
 	do := &pebble.Options{
 		Logger: &fatalLogger{}, // pebble info logs are messing up the logs
 		// (not a cosmossdk.io/log logger)
@@ -110,7 +110,7 @@ func (db *PebbleDB) Get(key []byte) ([]byte, error) {
 
 	res, closer, err := db.db.Get(key)
 	if err != nil {
-		if err == pebble.ErrNotFound {
+		if errors.Is(err, pebble.ErrNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -134,7 +134,7 @@ func (db *PebbleDB) Has(key []byte) (bool, error) {
 }
 
 // Set implements DB.
-func (db *PebbleDB) Set(key []byte, value []byte) error {
+func (db *PebbleDB) Set(key, value []byte) error {
 	// fmt.Println("PebbleDB.Set")
 	if len(key) == 0 {
 		return errKeyEmpty
@@ -156,7 +156,7 @@ func (db *PebbleDB) Set(key []byte, value []byte) error {
 }
 
 // SetSync implements DB.
-func (db *PebbleDB) SetSync(key []byte, value []byte) error {
+func (db *PebbleDB) SetSync(key, value []byte) error {
 	// fmt.Println("PebbleDB.SetSync")
 	if len(key) == 0 {
 		return errKeyEmpty

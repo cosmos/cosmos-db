@@ -27,7 +27,7 @@ const (
 )
 
 type (
-	dbCreator func(name string, dir string, opts Options) (DB, error)
+	dbCreator func(name, dir string, opts Options) (DB, error)
 
 	Options interface {
 		Get(string) interface{}

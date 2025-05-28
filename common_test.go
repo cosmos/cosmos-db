@@ -14,7 +14,7 @@ import (
 //----------------------------------------
 // Helper functions.
 
-func checkValue(t *testing.T, db DB, key []byte, valueWanted []byte) {
+func checkValue(t *testing.T, db DB, key, valueWanted []byte) {
 	valueGot, err := db.Get(key)
 	assert.NoError(t, err)
 	assert.Equal(t, valueWanted, valueGot)
@@ -42,7 +42,7 @@ func checkDomain(t *testing.T, itr Iterator, start, end []byte) {
 	assert.Equal(t, end, de, "checkDomain domain end incorrect")
 }
 
-func checkItem(t *testing.T, itr Iterator, key []byte, value []byte) {
+func checkItem(t *testing.T, itr Iterator, key, value []byte) {
 	v := itr.Value()
 
 	k := itr.Key()
@@ -93,7 +93,7 @@ func benchmarkRangeScans(b *testing.B, db DB, dbSize int64) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		start := rand.Int63n(dbSize - rangeSize) //nolint:gosec
+		start := rand.Int63n(dbSize - rangeSize)
 		end := start + rangeSize
 		iter, err := db.Iterator(int642Bytes(start), int642Bytes(end))
 		require.NoError(b, err)
@@ -122,7 +122,7 @@ func benchmarkRandomReadsWrites(b *testing.B, db DB) {
 	for i := 0; i < b.N; i++ {
 		// Write something
 		{
-			idx := rand.Int63n(numItems) //nolint:gosec
+			idx := rand.Int63n(numItems)
 			internal[idx]++
 			val := internal[idx]
 			idxBytes := int642Bytes(idx)
@@ -136,7 +136,7 @@ func benchmarkRandomReadsWrites(b *testing.B, db DB) {
 
 		// Read something
 		{
-			idx := rand.Int63n(numItems) //nolint:gosec
+			idx := rand.Int63n(numItems)
 			valExp := internal[idx]
 			idxBytes := int642Bytes(idx)
 			valBytes, err := db.Get(idxBytes)

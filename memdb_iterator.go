@@ -27,11 +27,11 @@ type memDBIterator struct {
 var _ Iterator = (*memDBIterator)(nil)
 
 // newMemDBIterator creates a new memDBIterator.
-func newMemDBIterator(db *MemDB, start []byte, end []byte, reverse bool) *memDBIterator {
+func newMemDBIterator(db *MemDB, start, end []byte, reverse bool) *memDBIterator {
 	return newMemDBIteratorMtxChoice(db, start, end, reverse, true)
 }
 
-func newMemDBIteratorMtxChoice(db *MemDB, start []byte, end []byte, reverse bool, useMtx bool) *memDBIterator {
+func newMemDBIteratorMtxChoice(db *MemDB, start, end []byte, reverse, useMtx bool) *memDBIterator {
 	ctx, cancel := context.WithCancel(context.Background())
 	ch := make(chan *item, chBufferSize)
 	iter := &memDBIterator{
@@ -105,7 +105,7 @@ func newMemDBIteratorMtxChoice(db *MemDB, start []byte, end []byte, reverse bool
 // Close implements Iterator.
 func (i *memDBIterator) Close() error {
 	i.cancel()
-	for range i.ch { //nolint:revive
+	for range i.ch {
 	} // drain channel
 	i.item = nil
 	return nil

@@ -64,7 +64,7 @@ func newPrefixIterator(prefix, start, end []byte, source Iterator) (*prefixDBIte
 }
 
 // Domain implements Iterator.
-func (itr *prefixDBIterator) Domain() (start []byte, end []byte) {
+func (itr *prefixDBIterator) Domain() (start, end []byte) {
 	return itr.start, itr.end
 }
 

@@ -51,7 +51,7 @@ func (pdb *PrefixDB) Has(key []byte) (bool, error) {
 }
 
 // Set implements DB.
-func (pdb *PrefixDB) Set(key []byte, value []byte) error {
+func (pdb *PrefixDB) Set(key, value []byte) error {
 	if len(key) == 0 {
 		return errKeyEmpty
 	}
@@ -67,7 +67,7 @@ func (pdb *PrefixDB) Set(key []byte, value []byte) error {
 }
 
 // SetSync implements DB.
-func (pdb *PrefixDB) SetSync(key []byte, value []byte) error {
+func (pdb *PrefixDB) SetSync(key, value []byte) error {
 	if len(key) == 0 {
 		return errKeyEmpty
 	}

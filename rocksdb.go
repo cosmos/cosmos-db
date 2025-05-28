@@ -61,7 +61,7 @@ func NewRocksDB(name, dir string, opts Options) (*RocksDB, error) {
 	return NewRocksDBWithOptions(name, dir, defaultOpts)
 }
 
-func NewRocksDBWithOptions(name string, dir string, opts *grocksdb.Options) (*RocksDB, error) {
+func NewRocksDBWithOptions(name, dir string, opts *grocksdb.Options) (*RocksDB, error) {
 	dbPath := filepath.Join(dir, name+DBFileSuffix)
 	db, err := grocksdb.OpenDb(opts, dbPath)
 	if err != nil {
@@ -87,8 +87,10 @@ func NewRocksDBWithRawDB(
 // NewRocksDBWithRaw is useful if user want to create the db in read-only or seconday-standby mode,
 // or customize the default read/write options.
 func NewRocksDBWithRaw(
-	db *grocksdb.DB, ro *grocksdb.ReadOptions,
-	wo *grocksdb.WriteOptions, woSync *grocksdb.WriteOptions,
+	db *grocksdb.DB,
+	ro *grocksdb.ReadOptions,
+	wo *grocksdb.WriteOptions,
+	woSync *grocksdb.WriteOptions,
 ) *RocksDB {
 	return &RocksDB{
 		db:     db,
@@ -120,7 +122,7 @@ func (db *RocksDB) Has(key []byte) (bool, error) {
 }
 
 // Set implements DB.
-func (db *RocksDB) Set(key []byte, value []byte) error {
+func (db *RocksDB) Set(key, value []byte) error {
 	if len(key) == 0 {
 		return errKeyEmpty
 	}

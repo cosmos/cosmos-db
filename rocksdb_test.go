@@ -22,7 +22,7 @@ func TestRocksDBBackend(t *testing.T) {
 	defer cleanupDBDir(dir, name)
 
 	_, ok := db.(*RocksDB)
-	assert.True(t, ok)
+	require.True(t, ok)
 }
 
 func TestWithRocksDB(t *testing.T) {
@@ -42,7 +42,7 @@ func TestRocksDBStats(t *testing.T) {
 	require.NoError(t, err)
 	defer cleanupDBDir(dir, name)
 
-	assert.NotEmpty(t, db.Stats())
+	require.NotEmpty(t, db.Stats())
 }
 
 func TestRocksDBWithOptions(t *testing.T) {

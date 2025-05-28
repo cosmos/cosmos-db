@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -151,7 +150,7 @@ func TestGoLevelDBBackend(t *testing.T) {
 	defer cleanupDBDir("", name)
 
 	_, ok := db.(*GoLevelDB)
-	assert.True(t, ok)
+	require.True(t, ok)
 }
 
 func TestDBIterator(t *testing.T) {

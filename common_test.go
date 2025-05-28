@@ -32,7 +32,7 @@ func checkNext(t *testing.T, itr Iterator, expected bool) {
 	t.Helper()
 
 	itr.Next()
-	// assert.NoError(t, err) TODO: look at fixing this
+	// require.NoError(t, err) TODO: look at fixing this
 	valid := itr.Valid()
 	require.Equal(t, expected, valid)
 }

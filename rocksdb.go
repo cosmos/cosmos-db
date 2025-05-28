@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	dbCreator := func(name string, dir string, opts Options) (DB, error) {
+	dbCreator := func(name, dir string, opts Options) (DB, error) {
 		return NewRocksDB(name, dir, opts)
 	}
 	registerDBCreator(RocksDBBackend, dbCreator, false)

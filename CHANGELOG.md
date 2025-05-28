@@ -1,6 +1,6 @@
 # Changelog
 
-## [v1.2.1] - 2025-05-28
+## [v1.1.2] - 2025-05-28
 
 * Make `Iterator` and `Batch` interfaces more flexible by a type alias
 * Update deps to the latest versions

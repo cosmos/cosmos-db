@@ -48,7 +48,7 @@ func defaultRocksdbOptions() *grocksdb.Options {
 	return rocksdbOpts
 }
 
-func NewRocksDB(name string, dir string, opts Options) (*RocksDB, error) {
+func NewRocksDB(name, dir string, opts Options) (*RocksDB, error) {
 	defaultOpts := defaultRocksdbOptions()
 
 	if opts != nil {

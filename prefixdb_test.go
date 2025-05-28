@@ -12,7 +12,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func mockDBWithStuff(t *testing.T) DB {
+func mockDBWithData(t *testing.T) DB {
+	t.Helper()
+
 	db := NewMemDB()
 	// Under "key" prefix
 	require.NoError(t, db.Set(bz("key"), bz("value")))
@@ -133,7 +135,7 @@ func Run(t *testing.T, db DB) {
 }
 
 func TestPrefixDBSimple(t *testing.T) {
-	db := mockDBWithStuff(t)
+	db := mockDBWithData(t)
 	pdb := NewPrefixDB(db, bz("key"))
 
 	checkValue(t, pdb, bz("key"), nil)
@@ -150,7 +152,7 @@ func TestPrefixDBSimple(t *testing.T) {
 }
 
 func TestPrefixDBIterator1(t *testing.T) {
-	db := mockDBWithStuff(t)
+	db := mockDBWithData(t)
 	pdb := NewPrefixDB(db, bz("key"))
 
 	itr, err := pdb.Iterator(nil, nil)
@@ -167,7 +169,7 @@ func TestPrefixDBIterator1(t *testing.T) {
 }
 
 func TestPrefixDBReverseIterator1(t *testing.T) {
-	db := mockDBWithStuff(t)
+	db := mockDBWithData(t)
 	pdb := NewPrefixDB(db, bz("key"))
 
 	itr, err := pdb.ReverseIterator(nil, nil)
@@ -184,7 +186,7 @@ func TestPrefixDBReverseIterator1(t *testing.T) {
 }
 
 func TestPrefixDBReverseIterator5(t *testing.T) {
-	db := mockDBWithStuff(t)
+	db := mockDBWithData(t)
 	pdb := NewPrefixDB(db, bz("key"))
 
 	itr, err := pdb.ReverseIterator(bz("1"), nil)
@@ -201,7 +203,7 @@ func TestPrefixDBReverseIterator5(t *testing.T) {
 }
 
 func TestPrefixDBReverseIterator6(t *testing.T) {
-	db := mockDBWithStuff(t)
+	db := mockDBWithData(t)
 	pdb := NewPrefixDB(db, bz("key"))
 
 	itr, err := pdb.ReverseIterator(bz("2"), nil)
@@ -216,7 +218,7 @@ func TestPrefixDBReverseIterator6(t *testing.T) {
 }
 
 func TestPrefixDBReverseIterator7(t *testing.T) {
-	db := mockDBWithStuff(t)
+	db := mockDBWithData(t)
 	pdb := NewPrefixDB(db, bz("key"))
 
 	itr, err := pdb.ReverseIterator(nil, bz("2"))

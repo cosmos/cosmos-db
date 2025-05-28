@@ -67,6 +67,8 @@ func checkValuePanics(t *testing.T, itr Iterator) {
 }
 
 func newTempDB(t *testing.T, backend BackendType) (db DB, dbDir string) {
+	t.Helper()
+
 	dirname, err := os.MkdirTemp("", "db_common_test")
 	require.NoError(t, err)
 	db, err = NewDB("testdb", backend, dirname)

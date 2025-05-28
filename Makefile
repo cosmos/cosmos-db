@@ -20,12 +20,10 @@ lint-install:
 
 lint: lint-install
 	@echo "--> Running linter"
-	@go mod verify
 	@golangci-lint run
 
 lint-fix: lint-install
 	@echo "--> Running linter"
-	@go mod verify
 	@golangci-lint run --fix
 .PHONY: lint lint-fix
 

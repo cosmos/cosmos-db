@@ -7,11 +7,11 @@ const (
 )
 
 // For testing convenience.
-func bz(s string) []byte {
+func stringToBytes(s string) []byte {
 	return []byte(s)
 }
 
-// Str constructs a random alphanumeric string of given length.
+// Str constructs a random alphanumeric string of a given length.
 func randStr(length int) string {
 	chars := []byte{}
 MAIN_LOOP:

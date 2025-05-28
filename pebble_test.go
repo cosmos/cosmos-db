@@ -37,7 +37,7 @@ func BenchmarkPebbleDBRandomReadsWrites(b *testing.B) {
 		b.Fatal(err)
 	}
 	defer func() {
-		db.Close()
+		require.NoError(b, db.Close())
 		cleanupDBDir("", name)
 	}()
 

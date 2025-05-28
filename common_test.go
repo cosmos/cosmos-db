@@ -103,8 +103,8 @@ func benchmarkRangeScans(b *testing.B, db DB, dbSize int64) {
 	}
 
 	for i := int64(0); i < dbSize; i++ {
-		bytes := int642Bytes(i)
-		err := db.Set(bytes, bytes)
+		bz := int642Bytes(i)
+		err := db.Set(bz, bz)
 		if err != nil {
 			// require.NoError() is very expensive (according to profiler), so check manually
 			b.Fatal(b, err)
@@ -121,7 +121,7 @@ func benchmarkRangeScans(b *testing.B, db DB, dbSize int64) {
 		for ; iter.Valid(); iter.Next() {
 			count++
 		}
-		iter.Close()
+		require.NoError(b, iter.Close())
 		require.EqualValues(b, rangeSize, count)
 	}
 }

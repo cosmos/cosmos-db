@@ -23,8 +23,8 @@ func newGoLevelDBIterator(source iterator.Iterator, start, end []byte, isReverse
 		} else {
 			valid := source.Seek(end)
 			if valid {
-				eoakey := source.Key() // end or after key
-				if bytes.Compare(end, eoakey) <= 0 {
+				eoaKey := source.Key() // end or after key
+				if bytes.Compare(end, eoaKey) <= 0 {
 					source.Prev()
 				}
 			} else {
@@ -129,7 +129,7 @@ func (itr *goLevelDBIterator) Close() error {
 	return nil
 }
 
-func (itr goLevelDBIterator) assertIsValid() {
+func (itr *goLevelDBIterator) assertIsValid() {
 	if !itr.Valid() {
 		panic("iterator is invalid")
 	}

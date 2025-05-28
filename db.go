@@ -14,7 +14,7 @@ const (
 	//   - pure go
 	//   - stable
 	GoLevelDBBackend BackendType = "goleveldb"
-	// MemDBBackend represents in-memory key value store, which is mostly used
+	// MemDBBackend represents an in-memory key value store, which is mostly used
 	// for testing.
 	MemDBBackend BackendType = "memdb"
 	// PebbleDBBackend represents pebble (uses github.com/cockroachdb/pebble)

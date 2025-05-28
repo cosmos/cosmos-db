@@ -353,8 +353,8 @@ func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
 	batchSize, err := batch.GetByteSize()
 	require.NoError(t, err)
 	// size of newly created batch should be 0 or negligible because of the metadata in the batch,
-	// for example peppble's batchHeaderLen is 12 so
-	// peppble's batch size will always be equal or greater than 12 even for empty batch
+	// for example, pebble's batchHeaderLen is 12, so
+	// pebble's batch size will always be equal or greater than 12 even for empty batches
 	require.LessOrEqual(t, batchSize, 32)
 
 	totalSizeOfKeyAndValue := 0
@@ -450,10 +450,10 @@ func testDBBatchOperations(t *testing.T, backend BackendType) {
 	require.NoError(t, err)
 	assertKeyValues(t, db, map[string][]byte{"a": {1}, "b": {2}})
 
-	// it should be possible to close an empty batch, and to re-close a closed batch
+	// it should be possible to close an empty batch and to re-close a closed batch
 	batch = db.NewBatch()
-	batch.Close()
-	batch.Close()
+	require.NoError(t, batch.Close())
+	require.NoError(t, batch.Close())
 
 	// all other operations on a closed batch should error
 	require.Error(t, batch.Set([]byte("a"), []byte{9}))

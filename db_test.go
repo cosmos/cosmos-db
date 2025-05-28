@@ -14,7 +14,7 @@ func TestDBIteratorSingleKey(t *testing.T) {
 			db, dir := newTempDB(t, backend)
 			defer os.RemoveAll(dir)
 
-			err := db.SetSync(bz("1"), bz("value_1"))
+			err := db.SetSync(stringToBytes("1"), stringToBytes("value_1"))
 			require.NoError(t, err)
 			itr, err := db.Iterator(nil, nil)
 			require.NoError(t, err)
@@ -36,10 +36,10 @@ func TestDBIteratorTwoKeys(t *testing.T) {
 			db, dir := newTempDB(t, backend)
 			defer os.RemoveAll(dir)
 
-			err := db.SetSync(bz("1"), bz("value_1"))
+			err := db.SetSync(stringToBytes("1"), stringToBytes("value_1"))
 			require.NoError(t, err)
 
-			err = db.SetSync(bz("2"), bz("value_1"))
+			err = db.SetSync(stringToBytes("2"), stringToBytes("value_1"))
 			require.NoError(t, err)
 
 			{ // Fail by calling Next too much
@@ -114,7 +114,7 @@ func TestDBIteratorEmptyBeginAfter(t *testing.T) {
 			db, dir := newTempDB(t, backend)
 			defer os.RemoveAll(dir)
 
-			itr, err := db.Iterator(bz("1"), nil)
+			itr, err := db.Iterator(stringToBytes("1"), nil)
 			require.NoError(t, err)
 
 			checkInvalid(t, itr)
@@ -128,9 +128,9 @@ func TestDBIteratorNonemptyBeginAfter(t *testing.T) {
 			db, dir := newTempDB(t, backend)
 			defer os.RemoveAll(dir)
 
-			err := db.SetSync(bz("1"), bz("value_1"))
+			err := db.SetSync(stringToBytes("1"), stringToBytes("value_1"))
 			require.NoError(t, err)
-			itr, err := db.Iterator(bz("2"), nil)
+			itr, err := db.Iterator(stringToBytes("2"), nil)
 			require.NoError(t, err)
 
 			checkInvalid(t, itr)

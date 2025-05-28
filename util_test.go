@@ -30,7 +30,7 @@ func TestPrefixIteratorNoMatch1(t *testing.T) {
 			defer os.RemoveAll(dir)
 			itr, err := IteratePrefix(db, []byte("2"))
 			require.NoError(t, err)
-			err = db.SetSync(bz("1"), bz("value_1"))
+			err = db.SetSync(stringToBytes("1"), stringToBytes("value_1"))
 			require.NoError(t, err)
 
 			checkInvalid(t, itr)
@@ -44,7 +44,7 @@ func TestPrefixIteratorNoMatch2(t *testing.T) {
 		t.Run(fmt.Sprintf("Prefix w/ backend %s", backend), func(t *testing.T) {
 			db, dir := newTempDB(t, backend)
 			defer os.RemoveAll(dir)
-			err := db.SetSync(bz("3"), bz("value_3"))
+			err := db.SetSync(stringToBytes("3"), stringToBytes("value_3"))
 			require.NoError(t, err)
 			itr, err := IteratePrefix(db, []byte("4"))
 			require.NoError(t, err)
@@ -60,13 +60,13 @@ func TestPrefixIteratorMatch1(t *testing.T) {
 		t.Run(fmt.Sprintf("Prefix w/ backend %s", backend), func(t *testing.T) {
 			db, dir := newTempDB(t, backend)
 			defer os.RemoveAll(dir)
-			err := db.SetSync(bz("2"), bz("value_2"))
+			err := db.SetSync(stringToBytes("2"), stringToBytes("value_2"))
 			require.NoError(t, err)
-			itr, err := IteratePrefix(db, bz("2"))
+			itr, err := IteratePrefix(db, stringToBytes("2"))
 			require.NoError(t, err)
 
 			checkValid(t, itr, true)
-			checkItem(t, itr, bz("2"), bz("value_2"))
+			checkItem(t, itr, stringToBytes("2"), stringToBytes("value_2"))
 			checkNext(t, itr, false)
 
 			// Once invalid...
@@ -83,27 +83,27 @@ func TestPrefixIteratorMatches1N(t *testing.T) {
 			defer os.RemoveAll(dir)
 
 			// prefixed
-			err := db.SetSync(bz("a/1"), bz("value_1"))
+			err := db.SetSync(stringToBytes("a/1"), stringToBytes("value_1"))
 			require.NoError(t, err)
-			err = db.SetSync(bz("a/3"), bz("value_3"))
+			err = db.SetSync(stringToBytes("a/3"), stringToBytes("value_3"))
 			require.NoError(t, err)
 
 			// not
-			err = db.SetSync(bz("b/3"), bz("value_3"))
+			err = db.SetSync(stringToBytes("b/3"), stringToBytes("value_3"))
 			require.NoError(t, err)
-			err = db.SetSync(bz("a-3"), bz("value_3"))
+			err = db.SetSync(stringToBytes("a-3"), stringToBytes("value_3"))
 			require.NoError(t, err)
-			err = db.SetSync(bz("a.3"), bz("value_3"))
+			err = db.SetSync(stringToBytes("a.3"), stringToBytes("value_3"))
 			require.NoError(t, err)
-			err = db.SetSync(bz("abcdefg"), bz("value_3"))
+			err = db.SetSync(stringToBytes("abcdefg"), stringToBytes("value_3"))
 			require.NoError(t, err)
-			itr, err := IteratePrefix(db, bz("a/"))
+			itr, err := IteratePrefix(db, stringToBytes("a/"))
 			require.NoError(t, err)
 
 			checkValid(t, itr, true)
-			checkItem(t, itr, bz("a/1"), bz("value_1"))
+			checkItem(t, itr, stringToBytes("a/1"), stringToBytes("value_1"))
 			checkNext(t, itr, true)
-			checkItem(t, itr, bz("a/3"), bz("value_3"))
+			checkItem(t, itr, stringToBytes("a/3"), stringToBytes("value_3"))
 
 			// Bad!
 			checkNext(t, itr, false)

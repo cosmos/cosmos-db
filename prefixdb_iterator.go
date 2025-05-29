@@ -36,7 +36,7 @@ type prefixDBIterator struct {
 var _ Iterator = (*prefixDBIterator)(nil)
 
 func newPrefixIterator(prefix, start, end []byte, source Iterator) (*prefixDBIterator, error) {
-	pitrInvalid := &prefixDBIterator{
+	pItrInvalid := &prefixDBIterator{
 		prefix: prefix,
 		start:  start,
 		end:    end,
@@ -51,7 +51,7 @@ func newPrefixIterator(prefix, start, end []byte, source Iterator) (*prefixDBIte
 	}
 
 	if !source.Valid() || !bytes.HasPrefix(source.Key(), prefix) {
-		return pitrInvalid, nil
+		return pItrInvalid, nil
 	}
 
 	return &prefixDBIterator{
@@ -64,7 +64,7 @@ func newPrefixIterator(prefix, start, end []byte, source Iterator) (*prefixDBIte
 }
 
 // Domain implements Iterator.
-func (itr *prefixDBIterator) Domain() (start []byte, end []byte) {
+func (itr *prefixDBIterator) Domain() (start, end []byte) {
 	return itr.start, itr.end
 }
 
@@ -98,7 +98,7 @@ func (itr *prefixDBIterator) Next() {
 	}
 }
 
-// Next implements Iterator.
+// Key implements Iterator.
 func (itr *prefixDBIterator) Key() []byte {
 	itr.assertIsValid()
 	key := itr.source.Key()

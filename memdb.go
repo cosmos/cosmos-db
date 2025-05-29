@@ -90,7 +90,7 @@ func (db *MemDB) Has(key []byte) (bool, error) {
 }
 
 // Set implements DB.
-func (db *MemDB) Set(key []byte, value []byte) error {
+func (db *MemDB) Set(key, value []byte) error {
 	if len(key) == 0 {
 		return errKeyEmpty
 	}
@@ -105,12 +105,12 @@ func (db *MemDB) Set(key []byte, value []byte) error {
 }
 
 // set sets a value without locking the mutex.
-func (db *MemDB) set(key []byte, value []byte) {
+func (db *MemDB) set(key, value []byte) {
 	db.btree.ReplaceOrInsert(newPair(key, value))
 }
 
 // SetSync implements DB.
-func (db *MemDB) SetSync(key []byte, value []byte) error {
+func (db *MemDB) SetSync(key, value []byte) error {
 	return db.Set(key, value)
 }
 
@@ -139,7 +139,7 @@ func (db *MemDB) DeleteSync(key []byte) error {
 // Close implements DB.
 func (db *MemDB) Close() error {
 	// Close is a noop since for an in-memory database, we don't have a destination to flush
-	// contents to nor do we want any data loss on invoking Close().
+	// contents to, nor do we want any data loss on invoking Close().
 	// See the discussion in https://github.com/tendermint/tendermint/libs/pull/56
 	return nil
 }

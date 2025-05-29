@@ -51,7 +51,7 @@ func (pdb *PrefixDB) Has(key []byte) (bool, error) {
 }
 
 // Set implements DB.
-func (pdb *PrefixDB) Set(key []byte, value []byte) error {
+func (pdb *PrefixDB) Set(key, value []byte) error {
 	if len(key) == 0 {
 		return errKeyEmpty
 	}
@@ -67,7 +67,7 @@ func (pdb *PrefixDB) Set(key []byte, value []byte) error {
 }
 
 // SetSync implements DB.
-func (pdb *PrefixDB) SetSync(key []byte, value []byte) error {
+func (pdb *PrefixDB) SetSync(key, value []byte) error {
 	if len(key) == 0 {
 		return errKeyEmpty
 	}
@@ -102,14 +102,14 @@ func (pdb *PrefixDB) Iterator(start, end []byte) (Iterator, error) {
 		return nil, errKeyEmpty
 	}
 
-	var pstart, pend []byte
-	pstart = append(cp(pdb.prefix), start...)
+	var pStart, pEnd []byte
+	pStart = append(cp(pdb.prefix), start...)
 	if end == nil {
-		pend = cpIncr(pdb.prefix)
+		pEnd = cpIncr(pdb.prefix)
 	} else {
-		pend = append(cp(pdb.prefix), end...)
+		pEnd = append(cp(pdb.prefix), end...)
 	}
-	itr, err := pdb.db.Iterator(pstart, pend)
+	itr, err := pdb.db.Iterator(pStart, pEnd)
 	if err != nil {
 		return nil, err
 	}
@@ -123,14 +123,14 @@ func (pdb *PrefixDB) ReverseIterator(start, end []byte) (Iterator, error) {
 		return nil, errKeyEmpty
 	}
 
-	var pstart, pend []byte
-	pstart = append(cp(pdb.prefix), start...)
+	var pStart, pEnd []byte
+	pStart = append(cp(pdb.prefix), start...)
 	if end == nil {
-		pend = cpIncr(pdb.prefix)
+		pEnd = cpIncr(pdb.prefix)
 	} else {
-		pend = append(cp(pdb.prefix), end...)
+		pEnd = append(cp(pdb.prefix), end...)
 	}
-	ritr, err := pdb.db.ReverseIterator(pstart, pend)
+	ritr, err := pdb.db.ReverseIterator(pStart, pEnd)
 	if err != nil {
 		return nil, err
 	}

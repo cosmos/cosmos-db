@@ -5,7 +5,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,7 +16,7 @@ func TestPebbleDBBackend(t *testing.T) {
 	defer cleanupDBDir(dir, name)
 
 	_, ok := db.(*PebbleDB)
-	assert.True(t, ok)
+	require.True(t, ok)
 }
 
 // func TestPebbleDBStats(t *testing.T) {
@@ -27,7 +26,7 @@ func TestPebbleDBBackend(t *testing.T) {
 // 	require.NoError(t, err)
 // 	defer cleanupDBDir(dir, name)
 
-// 	assert.NotEmpty(t, db.Stats())
+// 	require.NotEmpty(t, db.Stats())
 // }
 
 func BenchmarkPebbleDBRandomReadsWrites(b *testing.B) {
@@ -38,7 +37,7 @@ func BenchmarkPebbleDBRandomReadsWrites(b *testing.B) {
 		b.Fatal(err)
 	}
 	defer func() {
-		db.Close()
+		require.NoError(b, db.Close())
 		cleanupDBDir("", name)
 	}()
 

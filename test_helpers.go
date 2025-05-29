@@ -7,16 +7,16 @@ const (
 )
 
 // For testing convenience.
-func bz(s string) []byte {
+func stringToBytes(s string) []byte {
 	return []byte(s)
 }
 
-// Str constructs a random alphanumeric string of given length.
+// Str constructs a random alphanumeric string of a given length.
 func randStr(length int) string {
 	chars := []byte{}
 MAIN_LOOP:
 	for {
-		val := rand.Int63() //nolint:gosec
+		val := rand.Int63()
 		for i := 0; i < 10; i++ {
 			v := int(val & 0x3f) // rightmost 6 bits
 			if v >= 62 {         // only 62 characters in strChars

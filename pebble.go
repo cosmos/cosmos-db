@@ -2,6 +2,7 @@ package db
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"path/filepath"
 
@@ -76,7 +77,7 @@ type PebbleDB struct {
 
 var _ DB = (*PebbleDB)(nil)
 
-func NewPebbleDB(name string, dir string, opts Options) (DB, error) {
+func NewPebbleDB(name, dir string, opts Options) (DB, error) {
 	do := &pebble.Options{
 		Logger: &fatalLogger{}, // pebble info logs are messing up the logs
 		// (not a cosmossdk.io/log logger)
@@ -110,7 +111,7 @@ func (db *PebbleDB) Get(key []byte) ([]byte, error) {
 
 	res, closer, err := db.db.Get(key)
 	if err != nil {
-		if err == pebble.ErrNotFound {
+		if errors.Is(err, pebble.ErrNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -126,15 +127,15 @@ func (db *PebbleDB) Has(key []byte) (bool, error) {
 	if len(key) == 0 {
 		return false, errKeyEmpty
 	}
-	bytes, err := db.Get(key)
+	bz, err := db.Get(key)
 	if err != nil {
 		return false, err
 	}
-	return bytes != nil, nil
+	return bz != nil, nil
 }
 
 // Set implements DB.
-func (db *PebbleDB) Set(key []byte, value []byte) error {
+func (db *PebbleDB) Set(key, value []byte) error {
 	// fmt.Println("PebbleDB.Set")
 	if len(key) == 0 {
 		return errKeyEmpty
@@ -156,7 +157,7 @@ func (db *PebbleDB) Set(key []byte, value []byte) error {
 }
 
 // SetSync implements DB.
-func (db *PebbleDB) SetSync(key []byte, value []byte) error {
+func (db *PebbleDB) SetSync(key, value []byte) error {
 	// fmt.Println("PebbleDB.SetSync")
 	if len(key) == 0 {
 		return errKeyEmpty
@@ -186,7 +187,7 @@ func (db *PebbleDB) Delete(key []byte) error {
 }
 
 // DeleteSync implements DB.
-func (db PebbleDB) DeleteSync(key []byte) error {
+func (db *PebbleDB) DeleteSync(key []byte) error {
 	// fmt.Println("PebbleDB.DeleteSync")
 	if len(key) == 0 {
 		return errKeyEmpty
@@ -199,7 +200,7 @@ func (db *PebbleDB) DB() *pebble.DB {
 }
 
 // Close implements DB.
-func (db PebbleDB) Close() error {
+func (db *PebbleDB) Close() error {
 	// fmt.Println("PebbleDB.Close")
 	db.db.Close()
 	return nil
@@ -296,7 +297,6 @@ func newPebbleDBBatch(db *PebbleDB) *pebbleDBBatch {
 
 // Set implements Batch.
 func (b *pebbleDBBatch) Set(key, value []byte) error {
-	// fmt.Println("pebbleDBBatch.Set")
 	if len(key) == 0 {
 		return errKeyEmpty
 	}
@@ -311,7 +311,6 @@ func (b *pebbleDBBatch) Set(key, value []byte) error {
 
 // Delete implements Batch.
 func (b *pebbleDBBatch) Delete(key []byte) error {
-	// fmt.Println("pebbleDBBatch.Delete")
 	if len(key) == 0 {
 		return errKeyEmpty
 	}
@@ -323,7 +322,6 @@ func (b *pebbleDBBatch) Delete(key []byte) error {
 
 // Write implements Batch.
 func (b *pebbleDBBatch) Write() error {
-	// fmt.Println("pebbleDBBatch.Write")
 	if b.batch == nil {
 		return errBatchClosed
 	}
@@ -413,7 +411,6 @@ func (itr *pebbleDBIterator) Domain() ([]byte, []byte) {
 
 // Valid implements Iterator.
 func (itr *pebbleDBIterator) Valid() bool {
-	// fmt.Println("pebbleDBIterator.Valid")
 	// Once invalid, forever invalid.
 	if itr.isInvalid {
 		return false
@@ -457,21 +454,18 @@ func (itr *pebbleDBIterator) Valid() bool {
 
 // Key implements Iterator.
 func (itr *pebbleDBIterator) Key() []byte {
-	// fmt.Println("pebbleDBIterator.Key")
 	itr.assertIsValid()
 	return cp(itr.source.Key())
 }
 
 // Value implements Iterator.
 func (itr *pebbleDBIterator) Value() []byte {
-	// fmt.Println("pebbleDBIterator.Value")
 	itr.assertIsValid()
 	return cp(itr.source.Value())
 }
 
 // Next implements Iterator.
-func (itr pebbleDBIterator) Next() {
-	// fmt.Println("pebbleDBIterator.Next")
+func (itr *pebbleDBIterator) Next() {
 	itr.assertIsValid()
 	if itr.isReverse {
 		itr.source.Prev()

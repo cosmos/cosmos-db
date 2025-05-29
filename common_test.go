@@ -7,51 +7,64 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 //----------------------------------------
 // Helper functions.
 
-func checkValue(t *testing.T, db DB, key []byte, valueWanted []byte) {
+func checkValue(t *testing.T, db DB, key, valueWanted []byte) {
+	t.Helper()
+
 	valueGot, err := db.Get(key)
-	assert.NoError(t, err)
-	assert.Equal(t, valueWanted, valueGot)
+	require.NoError(t, err)
+	require.Equal(t, valueWanted, valueGot)
 }
 
 func checkValid(t *testing.T, itr Iterator, expected bool) {
+	t.Helper()
+
 	valid := itr.Valid()
 	require.Equal(t, expected, valid)
 }
 
 func checkNext(t *testing.T, itr Iterator, expected bool) {
+	t.Helper()
+
 	itr.Next()
-	// assert.NoError(t, err) TODO: look at fixing this
+	// require.NoError(t, err) TODO: look at fixing this
 	valid := itr.Valid()
 	require.Equal(t, expected, valid)
 }
 
 func checkNextPanics(t *testing.T, itr Iterator) {
-	assert.Panics(t, func() { itr.Next() }, "checkNextPanics expected an error but didn't")
+	t.Helper()
+
+	require.Panics(t, func() { itr.Next() }, "checkNextPanics expected an error but didn't")
 }
 
 func checkDomain(t *testing.T, itr Iterator, start, end []byte) {
+	t.Helper()
+
 	ds, de := itr.Domain()
-	assert.Equal(t, start, ds, "checkDomain domain start incorrect")
-	assert.Equal(t, end, de, "checkDomain domain end incorrect")
+	require.Equal(t, start, ds, "checkDomain domain start incorrect")
+	require.Equal(t, end, de, "checkDomain domain end incorrect")
 }
 
-func checkItem(t *testing.T, itr Iterator, key []byte, value []byte) {
+func checkItem(t *testing.T, itr Iterator, key, value []byte) {
+	t.Helper()
+
 	v := itr.Value()
 
 	k := itr.Key()
 
-	assert.Exactly(t, key, k)
-	assert.Exactly(t, value, v)
+	require.Exactly(t, key, k)
+	require.Exactly(t, value, v)
 }
 
 func checkInvalid(t *testing.T, itr Iterator) {
+	t.Helper()
+
 	checkValid(t, itr, false)
 	checkKeyPanics(t, itr)
 	checkValuePanics(t, itr)
@@ -59,14 +72,20 @@ func checkInvalid(t *testing.T, itr Iterator) {
 }
 
 func checkKeyPanics(t *testing.T, itr Iterator) {
-	assert.Panics(t, func() { itr.Key() }, "checkKeyPanics expected panic but didn't")
+	t.Helper()
+
+	require.Panics(t, func() { itr.Key() }, "checkKeyPanics expected panic but didn't")
 }
 
 func checkValuePanics(t *testing.T, itr Iterator) {
-	assert.Panics(t, func() { itr.Value() })
+	t.Helper()
+
+	require.Panics(t, func() { itr.Value() })
 }
 
 func newTempDB(t *testing.T, backend BackendType) (db DB, dbDir string) {
+	t.Helper()
+
 	dirname, err := os.MkdirTemp("", "db_common_test")
 	require.NoError(t, err)
 	db, err = NewDB("testdb", backend, dirname)
@@ -75,6 +94,7 @@ func newTempDB(t *testing.T, backend BackendType) (db DB, dbDir string) {
 }
 
 func benchmarkRangeScans(b *testing.B, db DB, dbSize int64) {
+	b.Helper()
 	b.StopTimer()
 
 	rangeSize := int64(10000)
@@ -83,8 +103,8 @@ func benchmarkRangeScans(b *testing.B, db DB, dbSize int64) {
 	}
 
 	for i := int64(0); i < dbSize; i++ {
-		bytes := int642Bytes(i)
-		err := db.Set(bytes, bytes)
+		bz := int642Bytes(i)
+		err := db.Set(bz, bz)
 		if err != nil {
 			// require.NoError() is very expensive (according to profiler), so check manually
 			b.Fatal(b, err)
@@ -93,7 +113,7 @@ func benchmarkRangeScans(b *testing.B, db DB, dbSize int64) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		start := rand.Int63n(dbSize - rangeSize) //nolint:gosec
+		start := rand.Int63n(dbSize - rangeSize)
 		end := start + rangeSize
 		iter, err := db.Iterator(int642Bytes(start), int642Bytes(end))
 		require.NoError(b, err)
@@ -101,12 +121,13 @@ func benchmarkRangeScans(b *testing.B, db DB, dbSize int64) {
 		for ; iter.Valid(); iter.Next() {
 			count++
 		}
-		iter.Close()
+		require.NoError(b, iter.Close())
 		require.EqualValues(b, rangeSize, count)
 	}
 }
 
 func benchmarkRandomReadsWrites(b *testing.B, db DB) {
+	b.Helper()
 	b.StopTimer()
 
 	// create dummy data
@@ -122,7 +143,7 @@ func benchmarkRandomReadsWrites(b *testing.B, db DB) {
 	for i := 0; i < b.N; i++ {
 		// Write something
 		{
-			idx := rand.Int63n(numItems) //nolint:gosec
+			idx := rand.Int63n(numItems)
 			internal[idx]++
 			val := internal[idx]
 			idxBytes := int642Bytes(idx)
@@ -136,7 +157,7 @@ func benchmarkRandomReadsWrites(b *testing.B, db DB) {
 
 		// Read something
 		{
-			idx := rand.Int63n(numItems) //nolint:gosec
+			idx := rand.Int63n(numItems)
 			valExp := internal[idx]
 			idxBytes := int642Bytes(idx)
 			valBytes, err := db.Get(idxBytes)

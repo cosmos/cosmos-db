@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDBIteratorSingleKey(t *testing.T) {
@@ -14,10 +14,10 @@ func TestDBIteratorSingleKey(t *testing.T) {
 			db, dir := newTempDB(t, backend)
 			defer os.RemoveAll(dir)
 
-			err := db.SetSync(bz("1"), bz("value_1"))
-			assert.NoError(t, err)
+			err := db.SetSync(stringToBytes("1"), stringToBytes("value_1"))
+			require.NoError(t, err)
 			itr, err := db.Iterator(nil, nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			checkValid(t, itr, true)
 			checkNext(t, itr, false)
@@ -36,15 +36,15 @@ func TestDBIteratorTwoKeys(t *testing.T) {
 			db, dir := newTempDB(t, backend)
 			defer os.RemoveAll(dir)
 
-			err := db.SetSync(bz("1"), bz("value_1"))
-			assert.NoError(t, err)
+			err := db.SetSync(stringToBytes("1"), stringToBytes("value_1"))
+			require.NoError(t, err)
 
-			err = db.SetSync(bz("2"), bz("value_1"))
-			assert.NoError(t, err)
+			err = db.SetSync(stringToBytes("2"), stringToBytes("value_1"))
+			require.NoError(t, err)
 
 			{ // Fail by calling Next too much
 				itr, err := db.Iterator(nil, nil)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				checkValid(t, itr, true)
 
 				checkNext(t, itr, true)
@@ -76,19 +76,19 @@ func TestDBIteratorMany(t *testing.T) {
 			value := []byte{5}
 			for _, k := range keys {
 				err := db.Set(k, value)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 
 			itr, err := db.Iterator(nil, nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			defer itr.Close()
 			for ; itr.Valid(); itr.Next() {
 				key := itr.Key()
 				value = itr.Value()
 				value1, err := db.Get(key)
-				assert.NoError(t, err)
-				assert.Equal(t, value1, value)
+				require.NoError(t, err)
+				require.Equal(t, value1, value)
 			}
 		})
 	}
@@ -101,7 +101,7 @@ func TestDBIteratorEmpty(t *testing.T) {
 			defer os.RemoveAll(dir)
 
 			itr, err := db.Iterator(nil, nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			checkInvalid(t, itr)
 		})
@@ -114,8 +114,8 @@ func TestDBIteratorEmptyBeginAfter(t *testing.T) {
 			db, dir := newTempDB(t, backend)
 			defer os.RemoveAll(dir)
 
-			itr, err := db.Iterator(bz("1"), nil)
-			assert.NoError(t, err)
+			itr, err := db.Iterator(stringToBytes("1"), nil)
+			require.NoError(t, err)
 
 			checkInvalid(t, itr)
 		})
@@ -128,10 +128,10 @@ func TestDBIteratorNonemptyBeginAfter(t *testing.T) {
 			db, dir := newTempDB(t, backend)
 			defer os.RemoveAll(dir)
 
-			err := db.SetSync(bz("1"), bz("value_1"))
-			assert.NoError(t, err)
-			itr, err := db.Iterator(bz("2"), nil)
-			assert.NoError(t, err)
+			err := db.SetSync(stringToBytes("1"), stringToBytes("value_1"))
+			require.NoError(t, err)
+			itr, err := db.Iterator(stringToBytes("2"), nil)
+			require.NoError(t, err)
 
 			checkInvalid(t, itr)
 		})

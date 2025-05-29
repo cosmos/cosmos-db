@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,12 +14,12 @@ import (
 func init() {
 	registerDBCreator("prefixdb", func(name, dir string, opts Options) (DB, error) {
 		mdb := NewMemDB()
-		mdb.Set([]byte("a"), []byte{1})    //nolint:errcheck
-		mdb.Set([]byte("b"), []byte{2})    //nolint:errcheck
-		mdb.Set([]byte("t"), []byte{20})   //nolint:errcheck
-		mdb.Set([]byte("test"), []byte{0}) //nolint:errcheck
-		mdb.Set([]byte("u"), []byte{21})   //nolint:errcheck
-		mdb.Set([]byte("z"), []byte{26})   //nolint:errcheck
+		_ = mdb.Set([]byte("a"), []byte{1})
+		_ = mdb.Set([]byte("b"), []byte{2})
+		_ = mdb.Set([]byte("t"), []byte{20})
+		_ = mdb.Set([]byte("test"), []byte{0})
+		_ = mdb.Set([]byte("u"), []byte{21})
+		_ = mdb.Set([]byte("z"), []byte{26})
 		return NewPrefixDB(mdb, []byte("test/")), nil
 	}, false)
 }
@@ -33,6 +32,8 @@ func cleanupDBDir(dir, name string) {
 }
 
 func testBackendGetSetDelete(t *testing.T, backend BackendType) {
+	t.Helper()
+
 	// Default
 	dirname, err := os.MkdirTemp("", fmt.Sprintf("test_backend_%s_", backend))
 	require.Nil(t, err)
@@ -149,7 +150,7 @@ func TestGoLevelDBBackend(t *testing.T) {
 	defer cleanupDBDir("", name)
 
 	_, ok := db.(*GoLevelDB)
-	assert.True(t, ok)
+	require.True(t, ok)
 }
 
 func TestDBIterator(t *testing.T) {
@@ -161,6 +162,8 @@ func TestDBIterator(t *testing.T) {
 }
 
 func testDBIterator(t *testing.T, backend BackendType) {
+	t.Helper()
+
 	name := fmt.Sprintf("test_%x", randStr(12))
 	dir := os.TempDir()
 	db, err := NewDB(name, backend, dir)
@@ -317,13 +320,15 @@ func testDBIterator(t *testing.T, backend BackendType) {
 }
 
 func verifyIterator(t *testing.T, itr Iterator, expected []int64, msg string) {
+	t.Helper()
+
 	var list []int64
 	for itr.Valid() {
 		key := itr.Key()
 		list = append(list, bytes2Int64(key))
 		itr.Next()
 	}
-	assert.Equal(t, expected, list, msg)
+	require.Equal(t, expected, list, msg)
 }
 
 func TestDBBatchGetByteSize(t *testing.T) {
@@ -335,6 +340,8 @@ func TestDBBatchGetByteSize(t *testing.T) {
 }
 
 func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
+	t.Helper()
+
 	name := fmt.Sprintf("test_%x", randStr(12))
 	dir := os.TempDir()
 	db, err := NewDB(name, backend, dir)
@@ -346,15 +353,15 @@ func testDBBatchGetByteSize(t *testing.T, backend BackendType) {
 	batchSize, err := batch.GetByteSize()
 	require.NoError(t, err)
 	// size of newly created batch should be 0 or negligible because of the metadata in the batch,
-	// for example peppble's batchHeaderLen is 12 so
-	// peppble's batch size will always be equal or greater than 12 even for empty batch
+	// for example, pebble's batchHeaderLen is 12, so
+	// pebble's batch size will always be equal or greater than 12 even for empty batches
 	require.LessOrEqual(t, batchSize, 32)
 
 	totalSizeOfKeyAndValue := 0
 	// set 100 random keys and values
 	for i := 0; i < 100; i++ {
-		keySize := rand.Intn(32) + 1   //nolint:gosec
-		valueSize := rand.Intn(32) + 1 //nolint:gosec
+		keySize := rand.Intn(32) + 1
+		valueSize := rand.Intn(32) + 1
 		totalSizeOfKeyAndValue += keySize + valueSize
 		require.NoError(t, batch.Set([]byte(randStr(keySize)), []byte(randStr(valueSize))))
 	}
@@ -382,6 +389,8 @@ func TestDBBatchOperations(t *testing.T) {
 }
 
 func testDBBatchOperations(t *testing.T, backend BackendType) {
+	t.Helper()
+
 	name := fmt.Sprintf("test_%x", randStr(12))
 	dir := os.TempDir()
 	db, err := NewDB(name, backend, dir)
@@ -441,10 +450,10 @@ func testDBBatchOperations(t *testing.T, backend BackendType) {
 	require.NoError(t, err)
 	assertKeyValues(t, db, map[string][]byte{"a": {1}, "b": {2}})
 
-	// it should be possible to close an empty batch, and to re-close a closed batch
+	// it should be possible to close an empty batch and to re-close a closed batch
 	batch = db.NewBatch()
-	batch.Close()
-	batch.Close()
+	require.NoError(t, batch.Close())
+	require.NoError(t, batch.Close())
 
 	// all other operations on a closed batch should error
 	require.Error(t, batch.Set([]byte("a"), []byte{9}))
@@ -454,6 +463,8 @@ func testDBBatchOperations(t *testing.T, backend BackendType) {
 }
 
 func assertKeyValues(t *testing.T, db DB, expect map[string][]byte) {
+	t.Helper()
+
 	iter, err := db.Iterator(nil, nil)
 	require.NoError(t, err)
 	defer iter.Close()
@@ -464,5 +475,5 @@ func assertKeyValues(t *testing.T, db DB, expect map[string][]byte) {
 		actual[string(iter.Key())] = iter.Value()
 	}
 
-	assert.Equal(t, expect, actual)
+	require.Equal(t, expect, actual)
 }

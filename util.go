@@ -34,7 +34,7 @@ func cpIncr(bz []byte) (ret []byte) {
 	return nil
 }
 
-// See DB interface documentation for more information.
+// IsKeyInDomain is a helper function for key inspection. See DB interface documentation for more information.
 func IsKeyInDomain(key, start, end []byte) bool {
 	if bytes.Compare(key, start) < 0 {
 		return false

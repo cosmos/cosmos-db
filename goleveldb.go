@@ -1,19 +1,20 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 
 	"github.com/spf13/cast"
 	"github.com/syndtr/goleveldb/leveldb"
-	"github.com/syndtr/goleveldb/leveldb/errors"
+	leveldberrors "github.com/syndtr/goleveldb/leveldb/errors"
 	"github.com/syndtr/goleveldb/leveldb/filter"
 	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
 
 func init() {
-	dbCreator := func(name string, dir string, opts Options) (DB, error) {
+	dbCreator := func(name, dir string, opts Options) (DB, error) {
 		return NewGoLevelDB(name, dir, opts)
 	}
 	registerDBCreator(GoLevelDBBackend, dbCreator, false)
@@ -25,7 +26,7 @@ type GoLevelDB struct {
 
 var _ DB = (*GoLevelDB)(nil)
 
-func NewGoLevelDB(name string, dir string, opts Options) (*GoLevelDB, error) {
+func NewGoLevelDB(name, dir string, opts Options) (*GoLevelDB, error) {
 	defaultOpts := &opt.Options{
 		Filter: filter.NewBloomFilter(10), // by default, goleveldb doesn't use a bloom filter.
 	}
@@ -39,7 +40,7 @@ func NewGoLevelDB(name string, dir string, opts Options) (*GoLevelDB, error) {
 	return NewGoLevelDBWithOpts(name, dir, defaultOpts)
 }
 
-func NewGoLevelDBWithOpts(name string, dir string, o *opt.Options) (*GoLevelDB, error) {
+func NewGoLevelDBWithOpts(name, dir string, o *opt.Options) (*GoLevelDB, error) {
 	dbPath := filepath.Join(dir, name+DBFileSuffix)
 	db, err := leveldb.OpenFile(dbPath, o)
 	if err != nil {
@@ -58,7 +59,7 @@ func (db *GoLevelDB) Get(key []byte) ([]byte, error) {
 	}
 	res, err := db.db.Get(key, nil)
 	if err != nil {
-		if err == errors.ErrNotFound {
+		if errors.Is(err, leveldberrors.ErrNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -76,7 +77,7 @@ func (db *GoLevelDB) Has(key []byte) (bool, error) {
 }
 
 // Set implements DB.
-func (db *GoLevelDB) Set(key []byte, value []byte) error {
+func (db *GoLevelDB) Set(key, value []byte) error {
 	if len(key) == 0 {
 		return errKeyEmpty
 	}
@@ -90,7 +91,7 @@ func (db *GoLevelDB) Set(key []byte, value []byte) error {
 }
 
 // SetSync implements DB.
-func (db *GoLevelDB) SetSync(key []byte, value []byte) error {
+func (db *GoLevelDB) SetSync(key, value []byte) error {
 	if len(key) == 0 {
 		return errKeyEmpty
 	}

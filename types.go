@@ -76,7 +76,7 @@ type DB interface {
 	Stats() map[string]string
 }
 
-// Batch represents a group of writes. They may or may not be written atomically depending on the
+// BatchI represents a group of writes. They may or may not be written atomically depending on the
 // backend. Callers must call Close on the batch when done.
 //
 // As with DB, given keys and values should be considered read-only, and must not be modified after
@@ -109,7 +109,7 @@ type BatchI interface {
 
 type Batch = BatchI
 
-// Iterator represents an iterator over a domain of keys. Callers must call Close when done.
+// IteratorI represents an iterator over a domain of keys. Callers must call Close when done.
 // No writes can happen to a domain while there exists an iterator over it, some backends may take
 // out database locks to ensure this will not happen.
 //
@@ -135,7 +135,7 @@ type Batch = BatchI
 type IteratorI interface {
 	// Domain returns the start (inclusive) and end (exclusive) limits of the iterator.
 	// CONTRACT: start, end readonly []byte
-	Domain() (start []byte, end []byte)
+	Domain() (start, end []byte)
 
 	// Valid returns whether the current iterator is valid. Once invalid, the Iterator remains
 	// invalid forever.

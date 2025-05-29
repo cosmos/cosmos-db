@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	dbCreator := func(name string, dir string, opts Options) (DB, error) {
+	dbCreator := func(name, dir string, opts Options) (DB, error) {
 		return NewRocksDB(name, dir, opts)
 	}
 	registerDBCreator(RocksDBBackend, dbCreator, false)
@@ -30,7 +30,7 @@ type RocksDB struct {
 var _ DB = (*RocksDB)(nil)
 
 // defaultRocksdbOptions, good enough for most cases, including heavy workloads.
-// 1GB table cache, 512MB write buffer(may use 50% more on heavy workloads).
+// 1GB table cache, 512MB write buffer (may use 50% more on heavy workloads).
 // compression: snappy as default, need to -lsnappy to enable.
 func defaultRocksdbOptions() *grocksdb.Options {
 	bbto := grocksdb.NewDefaultBlockBasedTableOptions()
@@ -48,7 +48,7 @@ func defaultRocksdbOptions() *grocksdb.Options {
 	return rocksdbOpts
 }
 
-func NewRocksDB(name string, dir string, opts Options) (*RocksDB, error) {
+func NewRocksDB(name, dir string, opts Options) (*RocksDB, error) {
 	defaultOpts := defaultRocksdbOptions()
 
 	if opts != nil {
@@ -61,7 +61,7 @@ func NewRocksDB(name string, dir string, opts Options) (*RocksDB, error) {
 	return NewRocksDBWithOptions(name, dir, defaultOpts)
 }
 
-func NewRocksDBWithOptions(name string, dir string, opts *grocksdb.Options) (*RocksDB, error) {
+func NewRocksDBWithOptions(name, dir string, opts *grocksdb.Options) (*RocksDB, error) {
 	dbPath := filepath.Join(dir, name+DBFileSuffix)
 	db, err := grocksdb.OpenDb(opts, dbPath)
 	if err != nil {
@@ -84,11 +84,13 @@ func NewRocksDBWithRawDB(
 	return NewRocksDBWithRaw(db, ro, wo, woSync)
 }
 
-// NewRocksDBWithRaw is useful if user want to create the db in read-only or seconday-standby mode,
+// NewRocksDBWithRaw is useful if user wants to create the db in read-only or secondary-standby mode
 // or customize the default read/write options.
 func NewRocksDBWithRaw(
-	db *grocksdb.DB, ro *grocksdb.ReadOptions,
-	wo *grocksdb.WriteOptions, woSync *grocksdb.WriteOptions,
+	db *grocksdb.DB,
+	ro *grocksdb.ReadOptions,
+	wo *grocksdb.WriteOptions,
+	woSync *grocksdb.WriteOptions,
 ) *RocksDB {
 	return &RocksDB{
 		db:     db,
@@ -120,7 +122,7 @@ func (db *RocksDB) Has(key []byte) (bool, error) {
 }
 
 // Set implements DB.
-func (db *RocksDB) Set(key []byte, value []byte) error {
+func (db *RocksDB) Set(key, value []byte) error {
 	if len(key) == 0 {
 		return errKeyEmpty
 	}
@@ -131,7 +133,7 @@ func (db *RocksDB) Set(key []byte, value []byte) error {
 }
 
 // SetSync implements DB.
-func (db *RocksDB) SetSync(key []byte, value []byte) error {
+func (db *RocksDB) SetSync(key, value []byte) error {
 	if len(key) == 0 {
 		return errKeyEmpty
 	}

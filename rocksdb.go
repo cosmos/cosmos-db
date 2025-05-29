@@ -30,7 +30,7 @@ type RocksDB struct {
 var _ DB = (*RocksDB)(nil)
 
 // defaultRocksdbOptions, good enough for most cases, including heavy workloads.
-// 1GB table cache, 512MB write buffer(may use 50% more on heavy workloads).
+// 1GB table cache, 512MB write buffer (may use 50% more on heavy workloads).
 // compression: snappy as default, need to -lsnappy to enable.
 func defaultRocksdbOptions() *grocksdb.Options {
 	bbto := grocksdb.NewDefaultBlockBasedTableOptions()
@@ -84,7 +84,7 @@ func NewRocksDBWithRawDB(
 	return NewRocksDBWithRaw(db, ro, wo, woSync)
 }
 
-// NewRocksDBWithRaw is useful if user want to create the db in read-only or seconday-standby mode,
+// NewRocksDBWithRaw is useful if user wants to create the db in read-only or secondary-standby mode
 // or customize the default read/write options.
 func NewRocksDBWithRaw(
 	db *grocksdb.DB,
@@ -133,7 +133,7 @@ func (db *RocksDB) Set(key, value []byte) error {
 }
 
 // SetSync implements DB.
-func (db *RocksDB) SetSync(key []byte, value []byte) error {
+func (db *RocksDB) SetSync(key, value []byte) error {
 	if len(key) == 0 {
 		return errKeyEmpty
 	}

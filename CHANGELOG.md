@@ -1,6 +1,10 @@
 # Changelog
 
-## [v1.1.2] - 2025-05-28
+## [v1.1.3] - 2025-06-03
+
+* Revert commit `38785e92904d435a97e0d1b171089278bddf6760` - "Make `Iterator` and `Batch` interfaces more flexible by a type alias"
+
+## [v1.1.2] - 2025-05-28 (RETRACTED)
 
 * Make `Iterator` and `Batch` interfaces more flexible by a type alias
 * Update deps to the latest versions

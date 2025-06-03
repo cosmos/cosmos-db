@@ -47,3 +47,5 @@ require (
 // grocksdb stays at v1.8.x in cosmos-db as it should support RocksDB v8.
 // the cosmos sdk v2 uses directly store/v2 which uses RocksDB v9 from 0.52+
 replace github.com/linxGnu/grocksdb => github.com/linxGnu/grocksdb v1.8.12
+
+retract v1.1.2

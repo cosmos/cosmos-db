@@ -76,6 +76,7 @@ type PebbleDB struct {
 }
 
 var _ DB = (*PebbleDB)(nil)
+
 const flushThreshold = 3_500_000_000 // ~3.5 GB
 
 func NewPebbleDB(name, dir string, opts Options) (DB, error) {
@@ -306,6 +307,8 @@ func (b *pebbleDBBatch) Set(key, value []byte) error {
 	}
 	if b.batch == nil {
 		return errBatchClosed
+	}
+
 	// Prevent Pebble batch from exceeding 4 GB hard limit
 	if b.batch.Len() > flushThreshold {
 		if err := b.batch.Commit(pebble.Sync); err != nil {
@@ -314,7 +317,6 @@ func (b *pebbleDBBatch) Set(key, value []byte) error {
 		b.batch.Reset()
 	}
 
-	}
 	return b.batch.Set(key, value, nil)
 }
 
@@ -326,6 +328,7 @@ func (b *pebbleDBBatch) Delete(key []byte) error {
 	if b.batch == nil {
 		return errBatchClosed
 	}
+
 	// Prevent Pebble batch from exceeding 4 GB hard limit
 	if b.batch.Len() > flushThreshold {
 		if err := b.batch.Commit(pebble.Sync); err != nil {

@@ -64,6 +64,13 @@ func (db *GoLevelDB) Get(key []byte) ([]byte, error) {
 		}
 		return nil, err
 	}
+	// Normalize nil to empty slice so callers can distinguish
+	// "key not found" (nil) from "key found with empty value" ([]byte{}).
+	// The underlying goleveldb returns nil for both empty values and
+	// successful reads of zero-length data.
+	if res == nil {
+		res = []byte{}
+	}
 	return res, nil
 }
 

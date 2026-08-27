@@ -77,14 +77,26 @@ type PebbleDB struct {
 
 var _ DB = (*PebbleDB)(nil)
 
-func NewPebbleDB(name, dir string, opts Options) (DB, error) {
+func pebbleOptions() *pebble.Options {
 	do := &pebble.Options{
 		Logger: &fatalLogger{}, // pebble info logs are messing up the logs
 		// (not a cosmossdk.io/log logger)
 		MaxConcurrentCompactions: func() int { return 3 }, // default 1
+		// A failing compaction or flush reports only through here, and
+		// EnsureDefaults would route it to the Infof silenced above.
+		EventListener: &pebble.EventListener{
+			BackgroundError: func(err error) {
+				pebble.DefaultLogger.Infof("pebble background error: %s", err)
+			},
+		},
 	}
 
 	do.EnsureDefaults()
+	return do
+}
+
+func NewPebbleDB(name, dir string, opts Options) (DB, error) {
+	do := pebbleOptions()
 
 	if opts != nil {
 		files := cast.ToInt(opts.Get("maxopenfiles"))

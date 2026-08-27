@@ -1,12 +1,26 @@
 package db
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
+	"log"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
+
+// TestPebbleBackgroundErrorIsLogged: the listener has to survive
+// EnsureDefaults, which would otherwise route it to the silenced Infof.
+func TestPebbleBackgroundErrorIsLogged(t *testing.T) {
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
+	t.Cleanup(func() { log.SetOutput(os.Stderr) })
+
+	pebbleOptions().EventListener.BackgroundError(errors.New("boom"))
+	require.Contains(t, buf.String(), "boom")
+}
 
 func TestPebbleDBBackend(t *testing.T) {
 	name := fmt.Sprintf("test_%x", randStr(12))

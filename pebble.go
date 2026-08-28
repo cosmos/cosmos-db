@@ -82,6 +82,17 @@ func NewPebbleDB(name, dir string, opts Options) (DB, error) {
 		Logger: &fatalLogger{}, // pebble info logs are messing up the logs
 		// (not a cosmossdk.io/log logger)
 		MaxConcurrentCompactions: func() int { return 3 }, // default 1
+		// Unset, pebble settles on FormatMostCompatible and leaves it there
+		// for the database's whole life, which pebble v2 refuses to open --
+		// and refuses before it would migrate anything, so no v2 build can do
+		// this for itself. Upgrading here readies a node for that bump instead
+		// of failing to start after it.
+		//
+		// FlushableIngest rather than FormatNewest is exactly what v2 needs:
+		// the next version up holds the open until every table predating the
+		// Pebblev1 format has been rewritten, which here is all of them.
+		// Stopping short leaves those to ordinary compaction.
+		FormatMajorVersion: pebble.FormatFlushableIngest,
 	}
 
 	do.EnsureDefaults()

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/cockroachdb/pebble"
+	"github.com/cockroachdb/pebble/v2"
 	"github.com/spf13/cast"
 )
 
@@ -77,14 +77,26 @@ type PebbleDB struct {
 
 var _ DB = (*PebbleDB)(nil)
 
-func NewPebbleDB(name, dir string, opts Options) (DB, error) {
+func pebbleOptions() *pebble.Options {
 	do := &pebble.Options{
 		Logger: &fatalLogger{}, // pebble info logs are messing up the logs
 		// (not a cosmossdk.io/log logger)
-		MaxConcurrentCompactions: func() int { return 3 }, // default 1
+		// v2 splits the old MaxConcurrentCompactions into a baseline and a
+		// heuristic ceiling. The old 3 was only the ceiling: keep the baseline
+		// at its default of 1, or every store compacts three ways all the time.
+		CompactionConcurrencyRange: func() (int, int) { return 1, 3 }, // default 1, 1
 	}
 
+	// EnsureDefaults routes a failed compaction or flush to the logger's
+	// Errorf and corruption to its Fatalf, so no listener of our own. Ending
+	// the process on corruption is what we want: a database that keeps serving
+	// past damage it cannot read diverges without saying so.
 	do.EnsureDefaults()
+	return do
+}
+
+func NewPebbleDB(name, dir string, opts Options) (DB, error) {
+	do := pebbleOptions()
 
 	if opts != nil {
 		files := cast.ToInt(opts.Get("maxopenfiles"))
@@ -500,3 +512,9 @@ func (*fatalLogger) Fatalf(format string, args ...interface{}) {
 }
 
 func (*fatalLogger) Infof(_ string, _ ...interface{}) {}
+
+// Errorf has to be spelled out: v2 calls it where v1 never did, and the
+// embedded Logger it would otherwise reach is nil.
+func (*fatalLogger) Errorf(format string, args ...interface{}) {
+	pebble.DefaultLogger.Errorf(format, args...)
+}

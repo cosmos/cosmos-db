@@ -17,7 +17,7 @@ const (
 	// MemDBBackend represents an in-memory key value store, which is mostly used
 	// for testing.
 	MemDBBackend BackendType = "memdb"
-	// PebbleDBBackend represents pebble (uses github.com/cockroachdb/pebble)
+	// PebbleDBBackend represents pebble (uses github.com/cockroachdb/pebble/v2)
 	//   - pure go
 	PebbleDBBackend BackendType = "pebbledb"
 	// RocksDBBackend represents rocksdb (uses github.com/linxGnu/grocksdb)

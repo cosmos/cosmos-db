@@ -133,6 +133,10 @@ func testBackendGetSetDelete(t *testing.T, backend BackendType) {
 	value, err = db.Get([]byte("x"))
 	require.NoError(t, err)
 	require.Equal(t, []byte{}, value)
+	// IAVL finds an empty tree's root with Has.
+	ok, err = db.Has([]byte("x"))
+	require.NoError(t, err)
+	require.True(t, ok)
 }
 
 func TestBackendsGetSetDelete(t *testing.T) {
@@ -141,6 +145,83 @@ func TestBackendsGetSetDelete(t *testing.T) {
 			testBackendGetSetDelete(t, dbType)
 		})
 	}
+}
+
+func TestBackendsUseAfterClose(t *testing.T) {
+	for dbType := range backends {
+		t.Run(string(dbType), func(t *testing.T) {
+			testBackendUseAfterClose(t, dbType, false)
+		})
+		t.Run(string(dbType)+"/prefixdb", func(t *testing.T) {
+			testBackendUseAfterClose(t, dbType, true)
+		})
+	}
+}
+
+// testBackendUseAfterClose verifies that calls after Close return errors
+// without panicking, except for MemDB, whose Close is a no-op.
+func testBackendUseAfterClose(t *testing.T, backend BackendType, prefixed bool) {
+	t.Helper()
+
+	db, err := NewDB("testdb", backend, t.TempDir())
+	require.NoError(t, err)
+	if prefixed {
+		db = NewPrefixDB(db, []byte("p/"))
+	}
+	require.NoError(t, db.Set([]byte("a"), []byte{1}))
+	itr, err := db.Iterator(nil, nil)
+	require.NoError(t, err)
+	batch := db.NewBatch()
+	require.NoError(t, batch.Set([]byte("b"), []byte{2}))
+
+	require.NoError(t, db.Close())
+
+	closes := backend != MemDBBackend && backend != "prefixdb"
+	check := func(err error) {
+		t.Helper()
+		if closes {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
+	}
+
+	// The iterator and the batch were made before Close.
+	for ; itr.Valid(); itr.Next() {
+		_ = itr.Key()
+		_ = itr.Value()
+	}
+	_ = itr.Error()
+	require.NoError(t, itr.Close())
+	check(batch.Write())
+	require.NoError(t, batch.Close())
+
+	_, err = db.Get([]byte("a"))
+	check(err)
+	_, err = db.Has([]byte("a"))
+	check(err)
+	check(db.Set([]byte("a"), []byte{1}))
+	check(db.SetSync([]byte("a"), []byte{1}))
+	check(db.Delete([]byte("a")))
+	check(db.DeleteSync([]byte("a")))
+	for _, open := range []func(start, end []byte) (Iterator, error){db.Iterator, db.ReverseIterator} {
+		itr, err := open(nil, nil)
+		if err == nil {
+			// goleveldb returns the error from the iterator.
+			err = itr.Error()
+			require.NoError(t, itr.Close())
+		}
+		check(err)
+	}
+	for _, write := range []func(Batch) error{Batch.Write, Batch.WriteSync} {
+		batch := db.NewBatch()
+		require.NoError(t, batch.Set([]byte("c"), []byte{3}))
+		check(write(batch))
+		require.NoError(t, batch.Close())
+	}
+	_ = db.Print()
+	_ = db.Stats()
+	check(db.Close())
 }
 
 func TestGoLevelDBBackend(t *testing.T) {
